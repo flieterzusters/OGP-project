@@ -1,20 +1,15 @@
-package main;
-
+package Game;
 
 import asteroids.IFacade;
 import asteroids.IShip;
 
 
 /**
- * @author Jasper
- * @version 0.11
+ * @author: Jasper
+ * @version: 0.1
  */
 
 public class Facade implements IFacade {
-	
-	public void Facede() {
-	
-	}
 
 	@Override
 	public IShip createShip() {
