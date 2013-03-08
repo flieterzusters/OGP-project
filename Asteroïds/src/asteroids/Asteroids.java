@@ -1,5 +1,6 @@
 package asteroids;
 
+
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -13,7 +14,9 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import Game.Facade;
+import main.Facade;
+
+
 
 @SuppressWarnings("serial")
 public class Asteroids extends JFrame {
