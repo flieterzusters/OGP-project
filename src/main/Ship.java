@@ -1,19 +1,24 @@
-/**
- * 
- */
+
 package main;
 
 import asteroids.IShip;
 import be.kuleuven.cs.som.annotate.*;
+import be.kuleuven.cs.som.taglet.*;
 
 /**
+ * A class of ships that have a position, velocity, radius, and direction.
+ * Ships can move, apply thrust and turn. The class also provides functionality for collision detection.
+ * 
+ * @invar A ship's speed limit can never exceed the speed of light (c=300000 km/s).
+ * 		  | getSpeedLimit =< 300000
+ * 
+ * @invar A ship's speed can never exceed it's speed limit. 
+ * 	      | getVelocity =< getSpeedLimit
+ * 
  * @author Jasper
  * @version 0.1
  */
-/**
- * @author Jasper
- *
- */
+
 public class Ship implements IShip {
 	
 	/**
@@ -44,9 +49,8 @@ public class Ship implements IShip {
 	 * @return The ship's current x-coordinate in km.
 	 */
 	@Basic
-	//TODO Afwerken Specificatie + Implementatie
 	public double getX() {
-		return 0;
+		return xPos;
 	}
 	
 	/**
@@ -54,17 +58,20 @@ public class Ship implements IShip {
 	 * @return The ship's current x-coordinate in km.
 	 */
 	@Basic
-	//TODO Afwerken Specificatie + Implementatie
 	public double getY() {
-		return 0;
+		return yPos;
 	}
 	
 	
 	/**
 	 * Moves the ship for a duration dt according to its current state.
 	 * The ship will be moved according to its current position and its current velocity during the specified duration <code>dt</code>.
-	 * The specified duration <code>dt</code> can never be less than zero
+	 * The specified duration <code>dt</code> can never be less than zero.
 	 * @param dt Specifies the duration of the move command.
+	 * @post The new xPos (yPos) is equal to the old xPos (yPos) changed by the xVelocity (yVelocity) multiplied by the given duration. 
+	 * 		| new this.getX() = this.getX() + getXVelocity*dt 
+	 * 		| new this.getY() = this.getY() + getYVelocity*dt
+	 * @throws 		 
 	 */
 	//TODO spec + implement
 	public void move(double dt) {
@@ -88,25 +95,50 @@ public class Ship implements IShip {
 	 * @return The ship's current velocity in the x-direction(km/s).
 	 */
 	@Basic
-	//TODO Afwerken Specificatie + Implementatie
 	public double getXVelocity() {
-		return 0;
+		return xVelocity;
 	}
 	/**
 	 * Returns the ship's current velocity in the y-direction, expressed in km/s.
 	 * @return The ship's current velocity in the y-direction(km/s).
 	 */
 	@Basic
-	//TODO Afwerken Specificatie + Implementatie
 	public double getYVelocity() {
-		return 0;
+		return yVelocity;
+	}
+	
+	/**
+	 * Returns the ship's total velocity (in km/s).	 * 
+	 * @return The ship's total velocity.
+	 */
+	public double getVelocity() {
+		return Math.sqrt(Math.pow(getXVelocity(),2)+Math.pow(getYVelocity(),2));
+	}
+	
+	/**
+	 * Returns the ship's maximum speed.
+	 * @return The ships maximum speed.
+	 */
+	@Basic
+	public double getSpeedLimit() {
+		return speedLimit;
+		
 	}
 	
 	/**
 	 * Changes the velocity of the ship by an amount <code>da</code>.
 	 * This method changes the velocity of the ship according to its current velocity and the direction it's facing.
-	 * The change in total velocity will be equal to the specified amount <code>da</code>
-	 * @param da The total velocity to be added to the ship's current velocity
+	 * The change in total velocity will be equal to the specified amount <code>da</code>.
+	 * @param da The total velocity to be added to the ship's current velocity.
+	 * 
+	 * @post If the given amount of change in velocity is equal to or less than zero, no change to the ship's velocity is made.
+	 * 	     | if(da =< 0) then 
+	 *       |       new getXVelocity = getXVelocity
+	 *       |	     new getYVelocity = getYVelocity
+	 * @post The new velocity vector is equal to the old velocity vector changed by the given amount da in the ship's current direction.
+	 *       | new getXVelocity = getXVelocity + da*cos(angle)
+	 *       | new getYVelocity = getYVelocity + da*sin(angle)
+	 * @post If the new total velocity would exceed the ship's upper speed limit, the new total velocity is equal to the speed of light.
 	 */
 	public void thrust(double da) {
 		
@@ -121,6 +153,11 @@ public class Ship implements IShip {
 	 * The ship's current velocity in the x-direction.
 	 */
 	private double yVelocity; 
+	
+	/**
+	 * The ship's maximum speed, cannot exceed the speed of light.
+	 */
+	private double speedLimit;
 	
 	
 	
