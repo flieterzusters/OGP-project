@@ -166,9 +166,8 @@ public class Ship implements IShip {
 	 * @return The ship's radius (in km).
 	 */
 	@Basic @Immutable
-	//TODO afwerken spec + implement
 	public double getRadius() {
-		return 0;
+		return radius;
 	}
 	
 	/**
@@ -183,7 +182,7 @@ public class Ship implements IShip {
 	//TODO spec+implement
 	@Basic
 	public double getDirection() {
-		return 0;
+		return angle;
 	}
 	
 	/**
