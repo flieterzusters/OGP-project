@@ -200,6 +200,48 @@ public class Ship implements IShip {
 	 */
 	public double angle;
 	
+	/**
+	 * Returns the distance between this ship and the given ship. This distance is the shortest distance the ships would have to move
+	 * to be adjacent to each other. When the given ship is the same as this ship, the distance is zero, when the ships overlap, the distance is negative.
+	 * @param Ship2 The ship to which the distance should be calculated.
+	 * @return The distance between the 2 ships. The distance is negative if and only if the ship's overlap.
+	 */
+	//TODO Defensieve specificatie + implementatie
+	public double getDistanceBetween(Ship ship2) {
+		return 0;
+	}
+	
+	/**
+	 * Returns true if and only if this ship overlaps with the given ship. A ship always overlaps with itself. Two adjacent ships are considered to overlap.
+	 * @param Ship2 The ship to check for overlap with.
+	 * @return True if this ship overlaps with the given ship, False if the ships do not overlap.
+	 */
+	//TODO defensieve specificatie + implementatie
+	public boolean overlap(Ship ship2) {
+		return false;
+	}
+	
+	
+	/**
+	 * Returns the time left (in seconds) before this ship collides for the first time with the given ship or Double.POSITIVE_INTINITY if they never collide.
+	 * A ship can never collide with itself.
+	 * @param Ship2 The ship to which the collision time should be calculated.
+	 * @return The time, in seconds, to collision with the given ship.
+	 */
+	public double getTimeToCollision(Ship ship2) {
+		return 0;
+	}
+	
+	/**
+	 * 
+	 * @param ship2
+	 * @return
+	 */
+	public double[] getCollisionPosition(Ship ship2) {
+		return null;
+	}
+	
+	
 	
 	
 	
