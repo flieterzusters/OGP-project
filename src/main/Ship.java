@@ -15,7 +15,7 @@ import be.kuleuven.cs.som.taglet.*;
  * @invar A ship's speed can never exceed it's speed limit. 
  * 	      | getVelocity =< getSpeedLimit
  * 
- * @author Jasper
+ * @author Jasper, Tom
  * @version 0.1
  */
 
@@ -42,7 +42,14 @@ public class Ship implements IShip {
 	public Ship(double x, double y, double xVelocity,
 			double yVelocity, double radius, double angle) {
 		
-	}
+		this.xPos = x;
+		this.yPos = y;
+		this.xVelocity = xVelocity;
+		this.yVelocity = yVelocity;
+		this.radius = radius;
+		this.angle = angle;
+				
+		}
 	
 	/**
 	 * Returns the current x-coordinate of the ship in km.
@@ -73,8 +80,10 @@ public class Ship implements IShip {
 	 * 		| new this.getY() = this.getY() + getYVelocity*dt
 	 * @throws 		 
 	 */
-	//TODO spec + implement
+	//TODO spec + exception!
 	public void move(double dt) {
+		xPos = xPos + this.getXVelocity()*dt;
+		yPos = yPos + this.getYVelocity()*dt;
 		
 	}
 	
@@ -141,6 +150,18 @@ public class Ship implements IShip {
 	 * @post If the new total velocity would exceed the ship's upper speed limit, the new total velocity is equal to the speed of light.
 	 */
 	public void thrust(double da) {
+		if (da>0)
+		{
+			xVelocity = getXVelocity() + da*Math.cos(angle);
+			yVelocity = getYVelocity() + da*Math.sin(angle);
+		}
+		if (this.getVelocity()>300000)
+		{
+			double proportion = (this.getXVelocity())/(this.getYVelocity());
+			yVelocity = (300000)/(Math.sqrt(1+Math.pow(proportion,2)));
+			xVelocity = Math.sqrt(Math.pow(300000,2)-Math.pow(this.getYVelocity(),2));
+			
+			}
 		
 	}
 	
@@ -190,7 +211,8 @@ public class Ship implements IShip {
 	 * @param angle The amount of radians to be added to the ships direction. 
 	 */
 	//TODO spec+implement
-	public void turn(double angle) {
+	public void turn(double Angle) {
+		angle = angle + Angle;
 		
 	}
 		
