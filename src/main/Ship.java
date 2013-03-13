@@ -229,7 +229,8 @@ public class Ship implements IShip {
 	 */
 	//TODO Defensieve specificatie + implementatie
 	public double getDistanceBetween(Ship ship2) {
-		return 0;
+		double distance = Math.sqrt(Math.pow(ship2.getX()-this.getX(),2)+Math.pow(ship2.getY()-this.getY(),2))-(ship2.getRadius()+this.getRadius());
+		return distance;
 	}
 	
 	/**
@@ -239,7 +240,11 @@ public class Ship implements IShip {
 	 */
 	//TODO defensieve specificatie + implementatie
 	public boolean overlap(Ship ship2) {
-		return false;
+		double distance = this.getDistanceBetween(ship2);
+		double sumOfRadius = this.getRadius() + ship2.getRadius();
+		if(distance <= sumOfRadius)
+		{return true;}
+		
 	}
 	
 	
