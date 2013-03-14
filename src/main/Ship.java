@@ -38,15 +38,19 @@ public class Ship implements IShip {
 	 * @param radius The ship's radius, expressed in m.
 	 * @param angle The direction the ship will face,expressed in radians (0 is to the right).
 	 */
-	//TODO Afwerken Specificatie + Implementatie
+	/* TODO Afwerken Specificatie + Implementatie; 
+	 * TODO Test radius; 
+	 * TODO Test snelheid 
+	 */
+	
 	public Ship(double x, double y, double xVelocity,
 			double yVelocity, double radius, double angle) {
 		
 		this.xPos = x;
 		this.yPos = y;
-		this.xVelocity = xVelocity;
+		this.xVelocity = xVelocity;				//Testen op geldoge snelheid
 		this.yVelocity = yVelocity;
-		this.radius = radius;
+		this.radius = radius; 					//Hier moet wel nog getest worden of de radius correct is
 		this.angle = angle;
 				
 		}
@@ -57,6 +61,7 @@ public class Ship implements IShip {
 	 */
 	@Basic
 	public double getX() {
+		
 		return xPos;
 	}
 	
@@ -66,6 +71,7 @@ public class Ship implements IShip {
 	 */
 	@Basic
 	public double getY() {
+		
 		return yPos;
 	}
 	
@@ -82,6 +88,7 @@ public class Ship implements IShip {
 	 */
 	//TODO spec + exception!
 	public void move(double dt) {
+		
 		xPos = xPos + this.getXVelocity()*dt;
 		yPos = yPos + this.getYVelocity()*dt;
 		
@@ -105,6 +112,7 @@ public class Ship implements IShip {
 	 */
 	@Basic
 	public double getXVelocity() {
+		
 		return xVelocity;
 	}
 	/**
@@ -113,14 +121,16 @@ public class Ship implements IShip {
 	 */
 	@Basic
 	public double getYVelocity() {
+		
 		return yVelocity;
 	}
 	
 	/**
-	 * Returns the ship's total velocity (in km/s).	 * 
+	 * Returns the ship's total velocity (in km/s).
 	 * @return The ship's total velocity.
 	 */
 	public double getVelocity() {
+		
 		return Math.sqrt(Math.pow(getXVelocity(),2)+Math.pow(getYVelocity(),2));
 	}
 	
@@ -130,6 +140,7 @@ public class Ship implements IShip {
 	 */
 	@Basic
 	public double getSpeedLimit() {
+		
 		return speedLimit;
 		
 	}
@@ -147,14 +158,17 @@ public class Ship implements IShip {
 	 * @post The new velocity vector is equal to the old velocity vector changed by the given amount da in the ship's current direction.
 	 *       | new getXVelocity = getXVelocity + da*cos(angle)
 	 *       | new getYVelocity = getYVelocity + da*sin(angle)
-	 * @post If the new total velocity would exceed the ship's upper speed limit, the new total velocity is equal to the speed of light.
+	 * @post If the new total velocity would exceed the ship's upper speed limit, 
+	 * 		 the new total velocity is changed to be equal to the speed of light without changing the directionof the velocity.
 	 */
 	public void thrust(double da) {
+		
 		if (da>0)
 		{
 			xVelocity = getXVelocity() + da*Math.cos(angle);
 			yVelocity = getYVelocity() + da*Math.sin(angle);
 		}
+		
 		if (this.getVelocity()>300000)
 		{
 			double proportion = (this.getXVelocity())/(this.getYVelocity());
@@ -188,6 +202,7 @@ public class Ship implements IShip {
 	 */
 	@Basic @Immutable
 	public double getRadius() {
+		
 		return radius;
 	}
 	
@@ -203,6 +218,7 @@ public class Ship implements IShip {
 	//TODO spec+implement
 	@Basic
 	public double getDirection() {
+		
 		return angle;
 	}
 	
@@ -212,6 +228,7 @@ public class Ship implements IShip {
 	 */
 	//TODO spec+implement
 	public void turn(double Angle) {
+		
 		angle = angle + Angle;
 		
 	}
@@ -229,6 +246,7 @@ public class Ship implements IShip {
 	 */
 	//TODO Defensieve specificatie + implementatie
 	public double getDistanceBetween(Ship ship2) {
+		
 		double distance = Math.sqrt(Math.pow(ship2.getX()-this.getX(),2)+Math.pow(ship2.getY()-this.getY(),2))-(ship2.getRadius()+this.getRadius());
 		return distance;
 	}
@@ -240,10 +258,13 @@ public class Ship implements IShip {
 	 */
 	//TODO defensieve specificatie + implementatie
 	public boolean overlap(Ship ship2) {
+		
 		double distance = this.getDistanceBetween(ship2);
 		double sumOfRadius = this.getRadius() + ship2.getRadius();
-		if(distance <= sumOfRadius)
-		{return true;}
+		
+		if(distance <= sumOfRadius)	{
+			return true;
+		}
 		
 	}
 	
