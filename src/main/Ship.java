@@ -266,6 +266,8 @@ public class Ship implements IShip {
 			return true;
 		}
 		
+		else return false;
+		
 	}
 	
 	
