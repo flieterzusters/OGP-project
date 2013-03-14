@@ -163,15 +163,15 @@ public class Ship implements IShip {
 	 */
 	public void thrust(double da) {
 		
-		if (da>0)
-		{
-			xVelocity = getXVelocity() + da*Math.cos(angle);
-			yVelocity = getYVelocity() + da*Math.sin(angle);
-		}
+		if (da <= 0) return;
 		
-		if (this.getVelocity()>300000)
+		xVelocity = getXVelocity() + da*Math.cos(angle);
+		yVelocity = getYVelocity() + da*Math.sin(angle);
+		
+		
+		if (this.getVelocity()>300000) 	//TODO Dit stuk code werkt niet voor negatieve waarden van xVelocity en yVelocity, ik zal het morgen aanpassen (Jasper)
 		{
-			double proportion = (this.getXVelocity())/(this.getYVelocity());
+			double proportion = (this.getXVelocity())/(this.getYVelocity());	//TODO Deze regel werkt niet als yVelocity 0 is.
 			yVelocity = (300000)/(Math.sqrt(1+Math.pow(proportion,2)));
 			xVelocity = Math.sqrt(Math.pow(300000,2)-Math.pow(this.getYVelocity(),2));
 			
