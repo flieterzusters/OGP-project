@@ -90,9 +90,10 @@ public class Ship implements IShip {
 	 * 		| new this.getY() = this.getY() + getYVelocity*dt
 	 * @throws 		 
 	 */
-	//TODO spec + exception!
-	public void move(double dt) {
+	//TODO specificatie throwable
+	public void move(double dt) throws IllegalArgumentException {
 		
+		if (Util.fuzzyLessThanOrEqualTo(dt, 0)) throw new IllegalArgumentException("The argument dt has to be positive!");
 		xPos = xPos + this.getXVelocity()*dt;
 		yPos = yPos + this.getYVelocity()*dt;
 		
