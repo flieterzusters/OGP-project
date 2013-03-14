@@ -42,8 +42,7 @@ public class Ship implements IShip {
 	 * @param angle The direction the ship will face,expressed in radians (0 is to the right).
 	 */
 	/* TODO Afwerken Specificatie + Implementatie; 
-	 * TODO Test radius; 
-	 * TODO Test snelheid 
+	 * TODO Test radius;  
 	 */
 	
 	public Ship(double x, double y, double xVelocity,
@@ -226,6 +225,11 @@ public class Ship implements IShip {
 		return radius;
 	}
 	
+
+	private double getSumOfRadii(Ship ship2) {
+		return this.getRadius() + ship2.getRadius();
+	}
+	
 	/**
 	 * The ship's radius (in km)
 	 */
@@ -267,9 +271,12 @@ public class Ship implements IShip {
 	//TODO Defensieve specificatie + implementatie
 	public double getDistanceBetween(Ship ship2) {
 		
-		double distance = Math.sqrt(Math.pow(ship2.getX()-this.getX(),2)+Math.pow(ship2.getY()-this.getY(),2))-(ship2.getRadius()+this.getRadius());
-		return distance;
+		double centerDistanceSquared = Math.pow(ship2.getX()-this.getX() , 2) + Math.pow(ship2.getY()-this.getY(), 2);
+		return Math.sqrt(centerDistanceSquared) - getSumOfRadii(ship2);
+		
 	}
+
+	
 	
 	/**
 	 * Returns true if and only if this ship overlaps with the given ship. A ship always overlaps with itself. Two adjacent ships are considered to overlap.
@@ -280,7 +287,7 @@ public class Ship implements IShip {
 	public boolean overlap(Ship ship2) {
 		
 		double distance = this.getDistanceBetween(ship2);
-		double sumOfRadius = this.getRadius() + ship2.getRadius();
+		double sumOfRadius = getSumOfRadii(ship2);
 		
 		if(Util.fuzzyLessThanOrEqualTo(distance, sumOfRadius))	{
 			return true;
