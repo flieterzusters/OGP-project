@@ -2,8 +2,11 @@
 package main;
 
 import asteroids.IShip;
+import asteroids.Util;
+
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
+
 
 /**
  * A class of ships that have a position, velocity, radius, and direction.
@@ -35,7 +38,7 @@ public class Ship implements IShip {
 	 * @param y	The initial y-coordinate of the ship, expressed in km.
 	 * @param xVelocity The initial velocity in the x-direction the ship will have, expressed in km/s.
 	 * @param yVelocity The initial velocity in the y-direction the ship will have, expressed in km/s.
-	 * @param radius The ship's radius, expressed in m.
+	 * @param radius The ship's radius, expressed in km.
 	 * @param angle The direction the ship will face,expressed in radians (0 is to the right).
 	 */
 	/* TODO Afwerken Specificatie + Implementatie; 
@@ -47,10 +50,11 @@ public class Ship implements IShip {
 			double yVelocity, double radius, double angle) {
 		
 		this.xPos = x;
-		this.yPos = y;
-		this.xVelocity = xVelocity;				//Testen op geldoge snelheid
-		this.yVelocity = yVelocity;
-		this.radius = radius; 					//Hier moet wel nog getest worden of de radius correct is
+		this.yPos = y;		
+		this.xVelocity = xVelocity;				//Testen op geldige snelheid, moet totaal uitgewerkt worden. Misshien zelfde wijze gebruiken als bij thrust 
+		this.yVelocity = yVelocity;				//Dan zou ik dat stuk code in een aparte (private) methode plaatsen aangezien we dat toch al minstens 2 maal nodig hebben. 
+		
+		this.radius = radius; 					//Hier moet wel nog getest worden of de radius correct is (moet exception throwen denk ik).
 		this.angle = angle;
 				
 		}
@@ -158,8 +162,9 @@ public class Ship implements IShip {
 	 * @post The new velocity vector is equal to the old velocity vector changed by the given amount da in the ship's current direction.
 	 *       | new getXVelocity = getXVelocity + da*cos(angle)
 	 *       | new getYVelocity = getYVelocity + da*sin(angle)
-	 * @post If the new total velocity would exceed the ship's upper speed limit, 
-	 * 		 the new total velocity is changed to be equal to the speed of light without changing the directionof the velocity.
+	 * @efect If the new total velocity would exceed the ship's upper speed limit, 
+	 * 		   the new total velocity is changed to be equal to the speed of light without changing the direction of the velocity.
+	 * 		 
 	 */
 	public void thrust(double da) {
 		
@@ -169,13 +174,27 @@ public class Ship implements IShip {
 		yVelocity = getYVelocity() + da*Math.sin(angle);
 		
 		
-		if (this.getVelocity()>300000) 	//TODO Dit stuk code werkt niet voor negatieve waarden van xVelocity en yVelocity, ik zal het morgen aanpassen (Jasper)
-		{
-			double proportion = (this.getXVelocity())/(this.getYVelocity());	//TODO Deze regel werkt niet als yVelocity 0 is.
-			yVelocity = (300000)/(Math.sqrt(1+Math.pow(proportion,2)));
-			xVelocity = Math.sqrt(Math.pow(300000,2)-Math.pow(this.getYVelocity(),2));
+		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), speedLimit)) {//TODO Dit stuk code werkt niet voor negatieve waarden van xVelocity en yVelocity, ik zal het morgen aanpassen (Jasper)
 			
-			}
+			this.makeVelocityValid(xVelocity, yVelocity);			
+		}
+		
+	}
+	/**
+	 * This method reduces a ships velocity to make it comply with it's speed limit without changing the direction of movement.
+	 * @param xVelocity The x-velocity the ship currently possesses.
+	 * @param yVelocity The y-velocity the ship currently possesses.
+	 * @post The new getXVelocity (getYVelocity) satisfies the upper speed limit of the ship and the direction of movement is the same as before.
+	 * 		 | new getVelocity() <= this.speedLimit
+	 * 		 | new atan2(getYVelocity(),getXVelocity()) = atan2(getYvelocity(), getXVelocity)	
+	 */
+	@Raw @Model
+	private void makeVelocityValid(double xVelocity, double yVelocity) {
+		
+		double angleOfMovement = Math.atan2(yVelocity,xVelocity);
+		
+		this.yVelocity = speedLimit*Math.cos(angleOfMovement);
+		this.xVelocity = speedLimit*Math.sin(angleOfMovement);
 		
 	}
 	
@@ -227,9 +246,9 @@ public class Ship implements IShip {
 	 * @param angle The amount of radians to be added to the ships direction. 
 	 */
 	//TODO spec+implement
-	public void turn(double Angle) {
+	public void turn(double angle) {
 		
-		angle = angle + Angle;
+		this.angle = this.angle + angle;
 		
 	}
 		
@@ -262,7 +281,7 @@ public class Ship implements IShip {
 		double distance = this.getDistanceBetween(ship2);
 		double sumOfRadius = this.getRadius() + ship2.getRadius();
 		
-		if(distance <= sumOfRadius)	{
+		if(Util.fuzzyLessThanOrEqualTo(distance, sumOfRadius))	{
 			return true;
 		}
 		
