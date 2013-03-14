@@ -51,9 +51,10 @@ public class Ship implements IShip {
 		
 		this.xPos = x;
 		this.yPos = y;		
-		this.xVelocity = xVelocity;				//Testen op geldige snelheid, moet totaal uitgewerkt worden. Misshien zelfde wijze gebruiken als bij thrust 
-		this.yVelocity = yVelocity;				//Dan zou ik dat stuk code in een aparte (private) methode plaatsen aangezien we dat toch al minstens 2 maal nodig hebben. 
-		
+		this.xVelocity = xVelocity;				 
+		this.yVelocity = yVelocity;	
+		this.speedLimit = 300000;							
+		if (Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.speedLimit)) this.makeVelocityValid(xVelocity, yVelocity);
 		this.radius = radius; 					//Hier moet wel nog getest worden of de radius correct is (moet exception throwen denk ik).
 		this.angle = angle;
 				
