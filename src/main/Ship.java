@@ -29,7 +29,13 @@ public class Ship implements IShip {
 	 */
 	//TODO Specificatie + Implementatie
 	public Ship(){
-		
+		this.xPos = 0;
+		this.yPos = 0;
+		this.xVelocity = 0;
+		this.yVelocity = 0;
+		this.speedLimit = 300000;
+		this.radius = 10; 					
+		this.angle = 0;
 	}
 	
 	/**
@@ -53,8 +59,11 @@ public class Ship implements IShip {
 		this.xVelocity = xVelocity;				 
 		this.yVelocity = yVelocity;	
 		this.speedLimit = 300000;							
-		if (Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.speedLimit)) this.makeVelocityValid(xVelocity, yVelocity);
-		this.radius = radius; 					//Hier moet wel nog getest worden of de radius correct is (moet exception throwen denk ik).
+		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.getSpeedLimit() )) this.makeVelocityValid(xVelocity, yVelocity);
+		if (radius >= 10) this.radius = radius; 
+			else {
+				throw new IllegalArgumentException ("The provided radius is too small.");
+			}
 		this.angle = angle;
 				
 		}
