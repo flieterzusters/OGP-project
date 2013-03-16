@@ -18,6 +18,7 @@ import be.kuleuven.cs.som.annotate.*;
  * @invar A ship's speed can never exceed it's speed limit. 
  * 	      | getVelocity =< getSpeedLimit
  * 
+ * 
  * @author Jasper, Tom
  * @version 0.1
  */
@@ -26,9 +27,13 @@ public class Ship implements IShip {
 	
 	/**
 	 * Creates a new Ship with default parameters.
+	 * The position will be initialised to the origin, the ship's speed will be zero, the radius will be 10km  and the angle will be zero.
+	 * @effect Creates a new Ship with default parameters.
+	 * 		  | ship(0, 0, 0, 0, 10, 0).
 	 */
-	//TODO Specificatie + Implementatie
-	public Ship() throws IllegalArgumentException {
+	
+	@Raw
+	public Ship() {
 		this(0, 0, 0, 0, 10, 0);
 		
 	}
@@ -42,10 +47,8 @@ public class Ship implements IShip {
 	 * @param radius The ship's radius, expressed in km.
 	 * @param angle The direction the ship will face,expressed in radians (0 is to the right).
 	 */
-	/* TODO Afwerken Specificatie + Implementatie; 
-	 * TODO Test radius;  
-	 */
 	
+	@Raw
 	public Ship(double x, double y, double xVelocity,
 			double yVelocity, double radius, double angle) throws IllegalArgumentException {
 		
@@ -62,10 +65,6 @@ public class Ship implements IShip {
 		this.angle = angle;
 				
 		}
-
-	
-
-	
 	
 	/**
 	 * Returns the current x-coordinate of the ship in km.
@@ -98,7 +97,7 @@ public class Ship implements IShip {
 	 * 		| new this.getY() = this.getY() + getYVelocity*dt
 	 * @throws IllegalArgumentException		 
 	 */
-	//TODO specificatie throwable
+	
 	public void move(double dt) throws IllegalArgumentException {	
 		
 		if (!isValidMoveArgument(dt)) throw new IllegalArgumentException("The given argument is either not a number or is negative.");
@@ -106,6 +105,7 @@ public class Ship implements IShip {
 		yPos = yPos + this.getYVelocity()*dt;
 		
 	}
+	
 	
 	private boolean isValidMoveArgument(double argument) {	
 		
@@ -312,6 +312,9 @@ public class Ship implements IShip {
 	/**
 	 * Turns the ship over a given angle in radians. <code>angle</code> can be negative 
 	 * @param angle The amount of radians to be added to the ships direction. 
+	 * @pre the given angle must be a double, Double.isNaN must return false. Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY are not valid arguments.
+	 * @post The given angle is added to the ship's direction
+	 * 		| new this.angle = this.angle + angle
 	 */
 	//TODO spec+implement
 	public void turn(double angle) {
