@@ -5,7 +5,7 @@ import asteroids.IShip;
 import asteroids.Util;
 
 import be.kuleuven.cs.som.annotate.*;
-import be.kuleuven.cs.som.taglet.*;
+
 
 
 /**
@@ -97,16 +97,23 @@ public class Ship implements IShip {
 	 * @post The new xPos (yPos) is equal to the old xPos (yPos) changed by the xVelocity (yVelocity) multiplied by the given duration. 
 	 * 		| new this.getX() = this.getX() + getXVelocity*dt 
 	 * 		| new this.getY() = this.getY() + getYVelocity*dt
-	 * @throws 		 
+	 * @throws IllegalArgumentException		 
 	 */
 	//TODO specificatie throwable
 	public void move(double dt) throws IllegalArgumentException {
 		
-		if (Util.fuzzyLessThanOrEqualTo(dt, 0)) throw new IllegalArgumentException("The argument dt has to be positive!");
+		
+		if (!isValidMoveArgument(dt)) throw new IllegalArgumentException("The given argument is either not a number or is negative.");
 		xPos = xPos + this.getXVelocity()*dt;
 		yPos = yPos + this.getYVelocity()*dt;
 		
 	}
+	
+	private boolean isValidMoveArgument(double argument) {
+		if (Util.fuzzyLessThanOrEqualTo(argument, 0)) {
+			return true;
+		} else return false;
+	}		
 	
 	/**
 	 * The ship's current position along the x-axis.
