@@ -48,7 +48,7 @@ public class ShipTest {
 			Ship newShip = new Ship(10, 10, 250000, 250000, 5, 0);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException thrown) {
-			assertThat(thrown.getMessage(), Is.is("The provided radius is too small."));
+			assertThat(thrown.getMessage(), Is.is("The provided radius is either not a number or is too small."));
 		}
 	}
 	
@@ -70,4 +70,6 @@ public class ShipTest {
 		assertTrue(Util.fuzzyEquals(dynamicShip1.getX(), 151.350 ));
 		assertTrue(Util.fuzzyEquals(dynamicShip1.getY(), 2050.675 ));
 	}
+	
+	
 }

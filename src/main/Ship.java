@@ -60,9 +60,9 @@ public class Ship implements IShip {
 		this.yVelocity = yVelocity;	
 		this.speedLimit = 300000;							
 		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.getSpeedLimit() )) this.makeVelocityValid(xVelocity, yVelocity);
-		if (radius >= 10) this.radius = radius; 
+		if (isValidRadius(radius)) this.radius = radius; 
 			else {
-				throw new IllegalArgumentException ("The provided radius is too small.");
+				throw new IllegalArgumentException ("The provided radius is either not a number or is too small.");
 			}
 		this.angle = angle;
 				
@@ -110,9 +110,9 @@ public class Ship implements IShip {
 	}
 	
 	private boolean isValidMoveArgument(double argument) {
-		if (Util.fuzzyLessThanOrEqualTo(argument, 0)) {
-			return true;
-		} else return false;
+		if (Double.isNaN(argument) || Util.fuzzyLessThanOrEqualTo(argument, 0)) {
+			return false;
+		} else return true;
 	}		
 	
 	/**
@@ -247,10 +247,22 @@ public class Ship implements IShip {
 		return this.getRadius() + ship2.getRadius();
 	}
 	
+	private boolean isValidRadius(double radius) {
+		if(Double.isNaN(radius) || !Util.fuzzyLessThanOrEqualTo(radius, minimumRadius)) return true;
+		else return false;
+	}
+	
+	/**
+	 * The minimum radius a ship must have. This cannot be smaller then 10.
+	 */
+	private static double minimumRadius = 10;
+	
 	/**
 	 * The ship's radius (in km)
 	 */
 	private final double radius;
+	
+	
 	
 	/**
 	 * Returns the direction the ship is currently facing.
