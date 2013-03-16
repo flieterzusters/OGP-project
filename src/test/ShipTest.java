@@ -1,6 +1,8 @@
-package main;
+package test;
 
 import static org.junit.Assert.*;
+
+import main.Ship;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -33,19 +35,39 @@ public class ShipTest {
 	}
 
 	@Test
-	public void constructorIllegalSpeed() {
+	public void constructorIllegalSpeedTest() {
 		Ship newShip = new Ship(10, 10, 250000, 250000, 15, 0);
 		assertTrue ("Speed has not been adjusted properly", Util.fuzzyLessThanOrEqualTo(newShip.getVelocity(), newShip.getSpeedLimit() ));
 	}
 	
 	@Test
-	public void constructorIllegalRadius() {
+	public void constructorIllegalRadiusTest() {
 		
 		try {
+			@SuppressWarnings("unused")
 			Ship newShip = new Ship(10, 10, 250000, 250000, 5, 0);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException thrown) {
 			assertThat(thrown.getMessage(), Is.is("The provided radius is too small."));
 		}
+	}
+	
+	@Test 
+	public void getXTest() {		
+		assertEquals("Expected a value of 100 for staticShip1", 100 ,staticShip1.getX(),Util.EPSILON);
+		assertEquals("Expected a value of -100 for staticShip2", -100, staticShip2.getX(), Util.EPSILON);
+	}
+	
+	@Test
+	public void getYTest() {
+		assertEquals("200 Expected for staticShip1", 200, staticShip1.getY(), Util.EPSILON);
+		assertEquals("-200 Expected for StaticShip2", -200, staticShip2.getY(), Util.EPSILON);
+	}
+	
+	@Test
+	public void moveTest_NormalCase() {
+		dynamicShip1.move(10.135);
+		assertTrue(Util.fuzzyEquals(dynamicShip1.getX(), 151.350 ));
+		assertTrue(Util.fuzzyEquals(dynamicShip1.getY(), 2050.675 ));
 	}
 }
