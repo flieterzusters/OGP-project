@@ -28,14 +28,9 @@ public class Ship implements IShip {
 	 * Creates a new Ship with default parameters.
 	 */
 	//TODO Specificatie + Implementatie
-	public Ship(){
-		this.xPos = 0;
-		this.yPos = 0;
-		this.xVelocity = 0;
-		this.yVelocity = 0;
-		this.speedLimit = 300000;
-		this.radius = 10; 					
-		this.angle = 0;
+	public Ship() throws IllegalArgumentException {
+		this(0, 0, 0, 0, 10, 0);
+		
 	}
 	
 	/**
@@ -52,12 +47,12 @@ public class Ship implements IShip {
 	 */
 	
 	public Ship(double x, double y, double xVelocity,
-			double yVelocity, double radius, double angle) {
+			double yVelocity, double radius, double angle) throws IllegalArgumentException {
 		
-		this.xPos = x;
-		this.yPos = y;		
-		this.xVelocity = xVelocity;				 
-		this.yVelocity = yVelocity;	
+		setXPos(x);
+		setYPos(y);
+		setXVelocity(xVelocity);				 
+		setYVelocity(yVelocity);	
 		this.speedLimit = 300000;							
 		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.getSpeedLimit() )) this.makeVelocityValid(xVelocity, yVelocity);
 		if (isValidRadius(radius)) this.radius = radius; 
@@ -67,6 +62,10 @@ public class Ship implements IShip {
 		this.angle = angle;
 				
 		}
+
+	
+
+	
 	
 	/**
 	 * Returns the current x-coordinate of the ship in km.
@@ -100,8 +99,7 @@ public class Ship implements IShip {
 	 * @throws IllegalArgumentException		 
 	 */
 	//TODO specificatie throwable
-	public void move(double dt) throws IllegalArgumentException {
-		
+	public void move(double dt) throws IllegalArgumentException {	
 		
 		if (!isValidMoveArgument(dt)) throw new IllegalArgumentException("The given argument is either not a number or is negative.");
 		xPos = xPos + this.getXVelocity()*dt;
@@ -109,11 +107,30 @@ public class Ship implements IShip {
 		
 	}
 	
-	private boolean isValidMoveArgument(double argument) {
+	private boolean isValidMoveArgument(double argument) {	
+		
 		if (Double.isNaN(argument) || Util.fuzzyLessThanOrEqualTo(argument, 0)) {
 			return false;
 		} else return true;
-	}		
+		
+	}	
+	
+	private void setXPos(double newXPos) throws IllegalArgumentException {
+		if(!isValidCoordinate(newXPos)) throw new IllegalArgumentException();
+		else xPos = newXPos;	
+	}
+	
+	private void setYPos(double newYPos) throws IllegalArgumentException {
+		if(!isValidCoordinate(newYPos)) throw new IllegalArgumentException();
+		else yPos = newYPos;
+	}
+		
+	private boolean isValidCoordinate(double coordinate) {
+		
+		if(Double.isNaN(coordinate)) return false;
+		else return true;
+		
+	}
 	
 	/**
 	 * The ship's current position along the x-axis.
@@ -187,8 +204,8 @@ public class Ship implements IShip {
 		
 		if (da <= 0) return;
 		
-		xVelocity = getXVelocity() + da*Math.cos(angle);
-		yVelocity = getYVelocity() + da*Math.sin(angle);
+		setXVelocity(getXVelocity() + da*Math.cos(angle));
+		setYVelocity(getYVelocity() + da*Math.sin(angle));
 		
 		
 		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), speedLimit)) {//TODO Dit stuk code werkt niet voor negatieve waarden van xVelocity en yVelocity, ik zal het morgen aanpassen (Jasper)
@@ -197,6 +214,23 @@ public class Ship implements IShip {
 		}
 		
 	}
+	
+	/**
+	 * @param xVelocity
+	 */
+	@Raw
+	private void setXVelocity(double xVelocity) {
+		this.xVelocity = xVelocity;
+	}
+	
+	/**
+	 * @param yVelocity
+	 */
+	@Raw
+	private void setYVelocity(double yVelocity) {
+		this.yVelocity = yVelocity;
+	}
+	
 	/**
 	 * This method reduces a ships velocity to make it comply with it's speed limit without changing the direction of movement.
 	 * @param xVelocity The x-velocity the ship currently possesses.
@@ -210,8 +244,8 @@ public class Ship implements IShip {
 		
 		double angleOfMovement = Math.atan2(yVelocity,xVelocity);
 		
-		this.yVelocity = speedLimit*Math.cos(angleOfMovement);
-		this.xVelocity = speedLimit*Math.sin(angleOfMovement);
+		setXVelocity(speedLimit*Math.cos(angleOfMovement));
+		setYVelocity(speedLimit*Math.sin(angleOfMovement));
 		
 	}
 	
@@ -248,8 +282,8 @@ public class Ship implements IShip {
 	}
 	
 	private boolean isValidRadius(double radius) {
-		if(Double.isNaN(radius) || !Util.fuzzyLessThanOrEqualTo(radius, minimumRadius)) return true;
-		else return false;
+		if(Double.isNaN(radius) || !Util.fuzzyLessThanOrEqualTo(minimumRadius, radius)) return false;
+		else return true;
 	}
 	
 	/**
@@ -285,6 +319,7 @@ public class Ship implements IShip {
 		this.angle = this.angle + angle;
 		
 	}
+	
 		
 	/**
 	 * The direction the ship is currently facing
