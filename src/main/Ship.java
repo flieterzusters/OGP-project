@@ -19,7 +19,7 @@ import be.kuleuven.cs.som.annotate.*;
  * 	      | getVelocity =< getSpeedLimit
  * 
  * @invar The value of angle will always be between 0 and 2*Pi (inclusive)
- * 		  | 0 <= angle >= 2*Pi
+ * 		  | 0 <= angle <= 2*Pi
  * @author Jasper, Tom
  * @version 0.1
  */
@@ -58,9 +58,9 @@ public class Ship implements IShip {
 		this.speedLimit = 300000;							
 		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.getSpeedLimit() )) this.makeVelocityValid(xVelocity, yVelocity);
 		if (isValidRadius(radius)) this.radius = radius; 
-			else {
+		else {
 				throw new IllegalArgumentException ("The provided radius is either not a number or is too small.");
-			}
+		}
 		setAngle(angle);				
 		}
 	
