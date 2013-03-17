@@ -18,7 +18,8 @@ import be.kuleuven.cs.som.annotate.*;
  * @invar A ship's speed can never exceed it's speed limit. 
  * 	      | getVelocity =< getSpeedLimit
  * 
- * 
+ * @invar The value of angle will always be between 0 and 2*Pi (inclusive)
+ * 		  | 0 <= angle >= 2*Pi
  * @author Jasper, Tom
  * @version 0.1
  */
@@ -32,7 +33,6 @@ public class Ship implements IShip {
 	 * 		  | ship(0, 0, 0, 0, 10, 0).
 	 */
 	
-	@Raw
 	public Ship() {
 		this(0, 0, 0, 0, 10, 0);
 		
@@ -48,7 +48,6 @@ public class Ship implements IShip {
 	 * @param angle The direction the ship will face,expressed in radians (0 is to the right).
 	 */
 	
-	@Raw
 	public Ship(double x, double y, double xVelocity,
 			double yVelocity, double radius, double angle) throws IllegalArgumentException {
 		
@@ -62,8 +61,7 @@ public class Ship implements IShip {
 			else {
 				throw new IllegalArgumentException ("The provided radius is either not a number or is too small.");
 			}
-		this.angle = angle;
-				
+		setAngle(angle);				
 		}
 	
 	/**
@@ -276,10 +274,13 @@ public class Ship implements IShip {
 		return radius;
 	}
 	
-
+	
 	private double getSumOfRadii(Ship ship2) {
 		return this.getRadius() + ship2.getRadius();
 	}
+
+	
+	
 	
 	private boolean isValidRadius(double radius) {
 		if(Double.isNaN(radius) || !Util.fuzzyLessThanOrEqualTo(minimumRadius, radius)) return false;
@@ -319,15 +320,24 @@ public class Ship implements IShip {
 	//TODO spec+implement
 	public void turn(double angle) {
 		
-		this.angle = this.angle + angle;
+		setAngle(this.angle + angle);
 		
 	}
 	
+	private void setAngle(double angle) {	
+		this.angle = angle;
+		while (this.angle < 0) {
+			this.angle += 2*Math.PI;
+		}
+		while (this.angle > 2*Math.PI) {
+			this.angle -= 2*Math.PI;
+		}
+	}
 		
 	/**
 	 * The direction the ship is currently facing
 	 */
-	public double angle;
+	private double angle;
 	
 	/**
 	 * Returns the distance between this ship and the given ship. This distance is the shortest distance the ships would have to move
@@ -372,7 +382,18 @@ public class Ship implements IShip {
 	 * @return The time, in seconds, to collision with the given ship.
 	 */
 	public double getTimeToCollision(Ship ship2) {
-		return 0;
+		double sigmaSquared = Math.pow(getSumOfRadii(ship2), 2);
+		double deltaVSquared = Math.pow(ship2.getXVelocity() - this.getXVelocity(), 2) 
+							 + Math.pow(ship2.getYVelocity() - this.getYVelocity(), 2);	
+		double deltaRSquared = Math.pow(ship2.getX() - this.getX(), 2) + Math.pow(ship2.getY() - this.getY(), 2);
+		double deltaVDeltaR = (ship2.getXVelocity() - this.getXVelocity())*(ship2.getX() - this.getX()) 
+							+ (ship2.getYVelocity() - this.getYVelocity())*(ship2.getY() - this.getY());
+		double d  = Math.pow(deltaVDeltaR, 2) - deltaVSquared*(deltaRSquared - sigmaSquared);
+		double deltaT;
+		if(Util.fuzzyEquals(deltaVDeltaR, 0) || deltaVDeltaR > 0 ) deltaT = Double.POSITIVE_INFINITY;
+		else if (Util.fuzzyLessThanOrEqualTo(d, 0)) deltaT = Double.POSITIVE_INFINITY;
+		else deltaT = -(deltaVDeltaR + Math.sqrt(d))/(deltaVSquared);
+		return deltaT;
 	}
 	
 	/**
@@ -381,7 +402,14 @@ public class Ship implements IShip {
 	 * @return
 	 */
 	public double[] getCollisionPosition(Ship ship2) {
-		return null;
+		double deltaT = getTimeToCollision(ship2);
+		if(deltaT == Double.POSITIVE_INFINITY) return null;
+		else {
+			double[] collisionPos = new double[2];
+			collisionPos[0] = this.getX() + deltaT*this.getXVelocity();
+			collisionPos [1] = this.getY() + deltaT*this.getYVelocity();
+			return collisionPos;
+		}
 	}
 	
 	
