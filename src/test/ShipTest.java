@@ -32,6 +32,7 @@ public class ShipTest {
 		staticShip4 = new Ship(-105, -230, 0, 0, 10, 0);
 		collisionShip1 = new Ship(500, 500, -20, -20, 10, 0);
 		
+		
 	}
 	@Before
 	public void setUp()  {
@@ -146,7 +147,24 @@ public class ShipTest {
 	}
 		
 	@Test
-	public void getTimeToCollisionTest_AgainstStaticShip() {
-		assertEquals("wrong time", 7.30819, collisionShip1.getTimeToCollision(defaultShip), Util.EPSILON);
+	public void getTimeToCollisionTest_LegalCase() {
+		assertEquals("wrong time", 24.292893, collisionShip1.getTimeToCollision(defaultShip), Util.EPSILON);
+	}
+	
+	public void getTimeToCollisionTest_NoCollision() {
+		assertEquals("Expectedd Double.POSITIVE_INFINITY", Double.POSITIVE_INFINITY, collisionShip1.getTimeToCollision(dynamicShip1), Util.EPSILON);
+	}
+	
+	@Test
+	public void getCollisionPositionTest_NotNull() {
+		double[] array = collisionShip1.getCollisionPosition(defaultShip);
+		assertEquals("Wrong x-coordinate",14.142140, array[0], Util.EPSILON);
+		assertEquals("Wrong y-coordinate",14.142140, array[1], Util.EPSILON);
+	}
+	
+	@Test
+	public void getCollisionPositionTest_Null() {
+		double[] array = collisionShip1.getCollisionPosition(dynamicShip1);
+		assertTrue("Expected True", array == null);
 	}
 }
