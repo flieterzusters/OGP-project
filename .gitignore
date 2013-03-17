@@ -2,3 +2,5 @@
 *.gif
 /doc
 /bin
+bin/main/Facade.class
+bin/main/Ship.class
