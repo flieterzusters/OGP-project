@@ -18,6 +18,9 @@ public class ShipTest {
 	public static Ship staticShip2;
 	public static Ship dynamicShip1;
 	public static Ship dynamicShip2;
+	public static Ship staticShip3;
+	public static Ship staticShip4;
+	public static Ship collisionShip1;
 	
 
 	@BeforeClass
@@ -25,8 +28,11 @@ public class ShipTest {
 		defaultShip = new Ship();
 		staticShip1 = new Ship(100, 200, 10000, 20000, 15, 0);
 		staticShip2 = new Ship(-100, -200, -10000, -20000, 25, 1.75);
+		staticShip3 = new Ship(-100, -235, 0, 0, 10, 0);	
+		staticShip4 = new Ship(-105, -230, 0, 0, 10, 0);
+		collisionShip1 = new Ship(500, 500, -20, -20, 10, 0);
+		
 	}
-
 	@Before
 	public void setUp()  {
 		dynamicShip1 = new Ship(50, 2000, 10, 5, 20, 1);
@@ -71,5 +77,76 @@ public class ShipTest {
 		assertTrue(Util.fuzzyEquals(dynamicShip1.getY(), 2050.675 ));
 	}
 	
+	@Test (expected=IllegalArgumentException.class)
+	public void moveTest_IllegalCase() throws IllegalArgumentException {
+		dynamicShip1.move(Math.sqrt(-1));
+	}
 	
+	@Test
+	public void getXVelocityTest() {
+		assertEquals("expected a value of 10", 10, dynamicShip1.getXVelocity(), Util.EPSILON);
+	}
+	
+	@Test
+	public void getYVelocityTest() {
+		assertEquals("expected a value of 5", 5, dynamicShip1.getYVelocity(), Util.EPSILON);
+	}
+	
+	@Test
+	public void thrustTest_LegalCase() {
+		dynamicShip1.thrust(50) ;
+		assertEquals("A value of approx. 37.015115 is expected", 37.015115, dynamicShip1.getXVelocity(), Util.EPSILON)	;
+		assertEquals("A value of approx. 47.07355 is expected", 47.07355, dynamicShip1.getYVelocity(),Util.EPSILON);
+		
+	}
+	
+	@Test 
+	public void thrustTest_SpeedLimitExceeded() {
+		dynamicShip2.thrust(300000);
+		assertEquals("A value of approx. -296971.7542 is expected", -296971.7542, dynamicShip2.getXVelocity(), Util.EPSILON);
+		assertEquals("A value of approx. 42517.96 is expected", 42517.96350, dynamicShip2.getYVelocity(), Util.EPSILON);
+		assertTrue("The speed is not aprox. equal to the speedlimit", Util.fuzzyEquals(dynamicShip2.getVelocity(), dynamicShip2.getSpeedLimit()));
+	}
+	
+	@Test
+	public void getRadiusTest() {
+		assertEquals("A value of 25 was expected", 25, staticShip2.getRadius(), Util.EPSILON);
+	}
+	
+	@Test
+	public void getDirectionTest() {
+		assertEquals("A value of 1.75 was expected", 1.75, staticShip2.getDirection(), Util.EPSILON);
+	}
+	
+	@Test
+	public void turnTest_NormalCase() {
+		dynamicShip1.turn(1);
+		assertEquals("The angle should be 2", 2, dynamicShip1.getDirection() , Util.EPSILON);
+	}
+	
+	@Test
+	public void turnTest_AngleOverflow() {
+		dynamicShip2.turn(6);
+		assertEquals("The angle should be 2.71681", 2.71681, dynamicShip2.getDirection() , Util.EPSILON);
+	}
+	
+	@Test
+	public void distanceBetweenTest_ZeroDistance() {
+		assertEquals("Expected a distance of zero", 0, staticShip2.getDistanceBetween(staticShip3), Util.EPSILON);
+	}
+	
+	@Test
+	public void distanceBetweenTest_PosDistance() {
+		assertEquals("Expected a distance of approx. 407.213595", 407.213595, staticShip2.getDistanceBetween(staticShip1), Util.EPSILON);
+	}
+	
+	@Test
+	public void distanceBetweenTest_NegDistance() {
+		assertEquals("Expected a distance of approx. -12.9289 ", -12.9289 ,staticShip3.getDistanceBetween(staticShip4) ,Util.EPSILON);
+	}
+		
+	@Test
+	public void getTimeToCollisionTest_AgainstStaticShip() {
+		assertEquals("wrong time", 7.30819, collisionShip1.getTimeToCollision(defaultShip), Util.EPSILON);
+	}
 }
