@@ -381,19 +381,22 @@ public class Ship implements IShip {
 	 * @param Ship2 The ship to which the collision time should be calculated.
 	 * @return The time, in seconds, to collision with the given ship.
 	 */
-	public double getTimeToCollision(Ship ship2) {
-		double sigmaSquared = Math.pow(getSumOfRadii(ship2), 2);
-		double deltaVSquared = Math.pow(ship2.getXVelocity() - this.getXVelocity(), 2) 
-							 + Math.pow(ship2.getYVelocity() - this.getYVelocity(), 2);	
-		double deltaRSquared = Math.pow(ship2.getX() - this.getX(), 2) + Math.pow(ship2.getY() - this.getY(), 2);
-		double deltaVDeltaR = (ship2.getXVelocity() - this.getXVelocity())*(ship2.getX() - this.getX()) 
-							+ (ship2.getYVelocity() - this.getYVelocity())*(ship2.getY() - this.getY());
-		double d  = Math.pow(deltaVDeltaR, 2) - deltaVSquared*(deltaRSquared - sigmaSquared);
-		double deltaT;
-		if(Util.fuzzyEquals(deltaVDeltaR, 0) || deltaVDeltaR > 0 ) deltaT = Double.POSITIVE_INFINITY;
-		else if (Util.fuzzyLessThanOrEqualTo(d, 0)) deltaT = Double.POSITIVE_INFINITY;
-		else deltaT = -(deltaVDeltaR + Math.sqrt(d))/(deltaVSquared);
-		return deltaT;
+	public double getTimeToCollision(Ship ship2) throws IllegalArgumentException {
+		if (ship2 == null) throw new IllegalArgumentException("this method requires a non-null object.");
+		else {
+			double sigmaSquared = Math.pow(getSumOfRadii(ship2), 2);
+			double deltaVSquared = Math.pow(ship2.getXVelocity() - this.getXVelocity(), 2) 
+								 + Math.pow(ship2.getYVelocity() - this.getYVelocity(), 2);	
+			double deltaRSquared = Math.pow(ship2.getX() - this.getX(), 2) + Math.pow(ship2.getY() - this.getY(), 2);
+			double deltaVDeltaR = (ship2.getXVelocity() - this.getXVelocity())*(ship2.getX() - this.getX()) 
+								+ (ship2.getYVelocity() - this.getYVelocity())*(ship2.getY() - this.getY());
+			double d  = Math.pow(deltaVDeltaR, 2) - deltaVSquared*(deltaRSquared - sigmaSquared);
+			double deltaT;
+			if(Util.fuzzyEquals(deltaVDeltaR, 0) || deltaVDeltaR > 0 ) deltaT = Double.POSITIVE_INFINITY;
+			else if (Util.fuzzyLessThanOrEqualTo(d, 0)) deltaT = Double.POSITIVE_INFINITY;
+			else deltaT = -(deltaVDeltaR + Math.sqrt(d))/(deltaVSquared);
+			return deltaT;
+		}
 	}
 	
 	/**
@@ -402,13 +405,17 @@ public class Ship implements IShip {
 	 * @return
 	 */
 	public double[] getCollisionPosition(Ship ship2) {
-		double deltaT = getTimeToCollision(ship2);
-		if(deltaT == Double.POSITIVE_INFINITY) return null;
+		if (ship2 == null) throw new IllegalArgumentException("this method requires a non-null object.");
 		else {
-			double[] collisionPos = new double[2];
-			collisionPos[0] = this.getX() + deltaT*this.getXVelocity();
-			collisionPos [1] = this.getY() + deltaT*this.getYVelocity();
-			return collisionPos;
+			double deltaT = getTimeToCollision(ship2);
+			if(deltaT == Double.POSITIVE_INFINITY) return null;
+			else {
+				double[] collisionPos = new double[2];
+				collisionPos[0] = this.getX() + deltaT*this.getXVelocity();
+				collisionPos [1] = this.getY() + deltaT*this.getYVelocity();
+				return collisionPos;
+		}
+		
 		}
 	}
 	

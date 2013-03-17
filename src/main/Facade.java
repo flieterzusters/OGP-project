@@ -21,7 +21,7 @@ public class Facade implements IFacade {
 
 	@Override
 	public IShip createShip(double x, double y, double xVelocity,
-			double yVelocity, double radius, double angle) {
+			double yVelocity, double radius, double angle) throws ModelException {
 		
 		try {Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, angle);
 		return ship1;}
@@ -68,7 +68,7 @@ public class Facade implements IFacade {
 	}
 
 	@Override
-	public void move(IShip ship, double dt) {
+	public void move(IShip ship, double dt) throws ModelException {
 		try {Ship bigShip1 = (Ship)ship;
 		bigShip1.move(dt);}
 		catch (IllegalArgumentException illegalargument){
@@ -101,15 +101,26 @@ public class Facade implements IFacade {
 	}
 
 	@Override
-	public double getTimeToCollision(IShip ship1, IShip ship2) {
-		Ship bigShip1 = (Ship)ship1;
-		return bigShip1.getTimeToCollision((Ship)ship2);
+	public double getTimeToCollision(IShip ship1, IShip ship2) throws ModelException {
+		try {
+			Ship bigShip1 = (Ship)ship1;
+			return bigShip1.getTimeToCollision((Ship)ship2);
+		}
+		catch (IllegalArgumentException thrown) {	
+			throw new ModelException(thrown);
+		}
 	}
+		
 
 	@Override
-	public double[] getCollisionPosition(IShip ship1, IShip ship2) {
-		Ship bigShip1 = (Ship)ship1;
+	public double[] getCollisionPosition(IShip ship1, IShip ship2) throws ModelException {
+		try {
+			Ship bigShip1 = (Ship)ship1;		
 		return bigShip1.getCollisionPosition((Ship)ship2);
+		}
+		catch(IllegalArgumentException thrown) {
+			throw new ModelException(thrown);
+		}
 	}
 
 }
