@@ -117,19 +117,38 @@ public class Bullet extends SpaceObject {
 	/**
 	 * 
 	 */
+	@Override
 	public void resolveBoundaryCollision()
 	{
 		this.numberOfBounces++;
 		if (numberOfBounces == 2) {this.Die();}
 		
-		else if(Util.fuzzyEquals(this.getX(), this.getRadius()) || 
-				Util.fuzzyEquals(this.getX(), this.getWorld().getWorldWidth()-this.getRadius())) {
+		else {super.resolveBoundaryCollision();}
+		
 			
-			this.xVelocity = -(this.getXVelocity());}
+	}
+	
+	@Override
+	public void resolve(SpaceObject spaceobject)
+	{
+		if(spaceobject instanceof Bullet || spaceobject instanceof Asteroid) 
+		{
+			this.Die();
+			spaceobject.Die();
+		}
 		
-		else {
-			this.yVelocity = -(this.getYVelocity());}
-		
+		if(spaceobject instanceof Ship)
+		{
+			if(this.getSource().equals(spaceobject))
+			{
+				Die();
+			}
+			else 
+			{
+				spaceobject.Die();
+			}
+			
+		}
 			
 	}
 

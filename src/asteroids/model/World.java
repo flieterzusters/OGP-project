@@ -199,25 +199,30 @@ public class World {
 		
 		if(!isValidEvolveArgument(dt)) { throw new IllegalArgumentException("The given argument is either not a number or is negative.");}
 		
-		double timeToFirstCollision = Double.POSITIVE_INFINITY;
-		double timeToCollision;
-		SpaceObject collisionObject1=null;
-		SpaceObject collisionObject2=null;
+		double timeToFirstCollision;
+		SpaceObject collisionObject1;
+		SpaceObject collisionObject2;
 		
 		while(true) {
 			
-		
+			timeToFirstCollision = Double.POSITIVE_INFINITY;
+			collisionObject1=null;
+			collisionObject2=null;
+			
 			for (SpaceObject spaceobject1 : Objects)
 			{
 				for (SpaceObject spaceobject2 : Objects)
 				{
-					timeToCollision = spaceobject1.getTimeToCollision(spaceobject2);
-			
-					if(timeToCollision<timeToFirstCollision)
+					if(!spaceobject1.equals(spaceobject2))
 					{
-						timeToFirstCollision = timeToCollision;
-						collisionObject1 = spaceobject1;
-						collisionObject2 = spaceobject2;
+						double timeToCollision = spaceobject1.getTimeToCollision(spaceobject2);
+			
+						if(timeToCollision<timeToFirstCollision)
+						{
+							timeToFirstCollision = timeToCollision;
+							collisionObject1 = spaceobject1;
+							collisionObject2 = spaceobject2;
+						}
 					}
 				}
 		
@@ -227,49 +232,44 @@ public class World {
 					collisionObject1 = spaceobject1;
 					collisionObject2 = null;
 				}
-				
-				if(timeToFirstCollision > dt)
-				{
-					break;
-				}
-				
-				
-				for(SpaceObject spaceobject : Objects)
-				{
-					spaceobject.move(timeToFirstCollision);
-				}
-				
-				if(timeToFirstCollision == Double.POSITIVE_INFINITY)
-				{
-					break;
-				}
-				
-				else if (collisionObject2 == null)
-				{
-					collisionObject1.resolveBoundaryCollision();
-				}
-				
-				else
-				{
-					resolve(collisionObject1, collisionObject2);
-				}
-				
-				dt = dt - timeToFirstCollision;
 			}
+				
+			if(timeToFirstCollision > dt)
+				break;
 			
+				
+				
 			for(SpaceObject spaceobject : Objects)
 			{
 				spaceobject.move(timeToFirstCollision);
 			}
-		
-		
-		}
-	}
+				
+			if(timeToFirstCollision == Double.POSITIVE_INFINITY)
+				break;
+	
 			
+			else if (collisionObject2 == null)
+			{
+				collisionObject1.resolveBoundaryCollision();
+			}
+				
+			else
+			{
+				collisionObject1.resolve(collisionObject2);
+			}
+				
+			dt = dt - timeToFirstCollision;
+		}
+			
+		for(SpaceObject spaceobject : Objects)
+		{
+			spaceobject.move(timeToFirstCollision);
+		}
 		
 		
+	}
 	
-	
+			
 	private boolean isValidEvolveArgument(double argument) {	
 		
 		if (Double.isNaN(argument) || argument <= 0) {
@@ -277,29 +277,6 @@ public class World {
 	 	else {return true;}
 	}
 	
-	private void resolve(SpaceObject collisionObject1, SpaceObject collisionObject2)
-	{
-		if(collisionObject1 == null || collisionObject2 == null) {throw new NullPointerException();}
-		
-		// TO DO: A bullet can't kill his source.
-		if (collisionObject1 instanceof Bullet || collisionObject2 instanceof Bullet)
-		{
-			collisionObject1.Die();
-			collisionObject2.Die();
-		}
-		if (collisionObject1 instanceof Ship && collisionObject2 instanceof Ship || collisionObject1 instanceof Asteroid && collisionObject2 instanceof Asteroid)
-		{
-			collisionObject1.resolveCollision(collisionObject2);
-		}
-		if (collisionObject1 instanceof Ship && collisionObject2 instanceof Asteroid)
-		{
-			collisionObject1.Die();
-		}
-		if (collisionObject1 instanceof Asteroid && collisionObject2 instanceof Ship)
-		{
-			collisionObject2.Die();
-		}
-		
-	}
+	
 }
 	

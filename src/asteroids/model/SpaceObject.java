@@ -387,7 +387,6 @@ abstract public class SpaceObject {
 		if (secondObject == null) throw new NullPointerException();
 		
 		else {
-			assert(!secondObject.equals(this));
 			double sigmaSquared = Math.pow(getSumOfRadii(secondObject), 2);
 			double deltaVSquared = Math.pow(secondObject.getXVelocity() - this.getXVelocity(), 2) 
 								 + Math.pow(secondObject.getYVelocity() - this.getYVelocity(), 2);	
@@ -459,7 +458,7 @@ abstract public class SpaceObject {
 		
 	
 	
-	public void Die() {
+	protected void Die() {
 		
 		if(this.getWorld() != null) {
 		this.getWorld().removeObject(this);
@@ -471,39 +470,44 @@ abstract public class SpaceObject {
 	
 	public double getTimeToBoundaryCollision() {
 		
-		double worldwidth = this.getWorld().getWorldWidth();
-		double worldheight = this.getWorld().getWorldHeight();
+		double worldwidth = getWorld().getWorldWidth();
+		double worldheight = getWorld().getWorldHeight();
 		
-		double distanceToTopOrBottom;
-		double timeToBoundaryCollision1;
-		double timeToBoundaryCollision2;
+		double timeToBoundaryX;
+		double timeToBoundaryY;
 
-		if(Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0)) {
+		if(this.getYVelocity() < 0) {
 			
-			distanceToTopOrBottom = this.getY()-this.getRadius();}
+			timeToBoundaryY = Math.abs((getY()- getRadius())/(getYVelocity()));}
 		
-		else {
-			distanceToTopOrBottom = worldheight - this.getY() - this.getRadius();
-		}
-		
-		timeToBoundaryCollision1 = Math.abs((distanceToTopOrBottom)/(this.getYVelocity()));
-		
-		double distanceToLeftOrRightWall;
-		
-		if(Util.fuzzyLessThanOrEqualTo(this.getXVelocity(), 0))
-		{
-			distanceToLeftOrRightWall = this.getX()-this.getRadius();
+		else if (getYVelocity() > 0) {
+			
+			timeToBoundaryY = Math.abs((worldheight - getY() - getRadius())/(getYVelocity()));
 		}
 		
 		else {
-			distanceToLeftOrRightWall = worldwidth - this.getX() - this.getRadius();
+			timeToBoundaryY = Double.POSITIVE_INFINITY;
 		}
 		
-		timeToBoundaryCollision2 = Math.abs((distanceToLeftOrRightWall)/(this.getXVelocity()));
+		if(this.getXVelocity() < 0) {
+			
+			timeToBoundaryX = Math.abs((getX()- getRadius())/(getXVelocity()));}
 		
-		return Math.min(timeToBoundaryCollision1, timeToBoundaryCollision2);
-		
+		else if (getXVelocity() > 0) {
+			
+			timeToBoundaryX = Math.abs((worldwidth - getX() - getRadius())/(getXVelocity()));
 		}
+		
+		else {
+			timeToBoundaryX = Double.POSITIVE_INFINITY;
+		}
+		
+		
+		
+		
+		return Math.min(timeToBoundaryX, timeToBoundaryY);
+		
+	}
 	
 	public void resolveBoundaryCollision()
 	{
@@ -518,6 +522,9 @@ abstract public class SpaceObject {
 		
 			
 	}
+	
+	public abstract void resolve(SpaceObject collisionobject);
+	
 }
 		
 		

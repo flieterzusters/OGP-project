@@ -20,7 +20,7 @@ public class ShipTest {
 	private static Ship staticShip3;
 	private static Ship staticShip4;
 	private static Ship collisionShip1;
-	private static World shipWorld;
+
 	
 
 	@BeforeClass
@@ -38,7 +38,7 @@ public class ShipTest {
 	public void setUp()  {
 		dynamicShip1 = new Ship(50, 2000, 10, 5, 20, 1,2);
 		dynamicShip2 = new Ship(-30.5, -20.1,-100, 200, 15, 3, 55);
-		shipWorld = new World(1000, 1000);
+	
 		
 	}
 

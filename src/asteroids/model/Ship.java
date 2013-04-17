@@ -255,13 +255,30 @@ public class Ship extends SpaceObject {
 		
 		if(this.getWorld()==null) {return;}
 		
-		double bulletXPos = Math.cos(this.getDirection())*(this.getRadius()+3);
-		double bulletYPos = Math.sin(this.getDirection())*(this.getRadius()+3);
-		double bulletXVelocity = Math.cos(this.getDirection())* 250;
-		double bulletYVelocity = Math.sin(this.getDirection())* 250;
+		double bulletRadius = 3;
+		double bulletSpeed = 250;
+		double bulletXPos = Math.cos(this.getDirection())*(this.getRadius()+ bulletRadius);
+		double bulletYPos = Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
+		double bulletXVelocity = Math.cos(this.getDirection())* bulletSpeed;
+		double bulletYVelocity = Math.sin(this.getDirection())* bulletSpeed;
 		Bullet bullet = new Bullet(bulletXPos, bulletYPos, bulletXVelocity, bulletYVelocity, this);
 		this.getWorld().addObject(bullet);
 	}
 	
-	
+	@Override
+	public void resolve(SpaceObject spaceobject)
+	{
+		if(spaceobject instanceof Ship) {
+			resolveCollision(spaceobject);}
+		
+		if(spaceobject instanceof Asteroid) {
+			this.Die();
+			spaceobject.Die();}
+		
+		if(spaceobject instanceof Bullet) {
+			spaceobject.resolve(this);}
+		
 	}
+	
+	
+}

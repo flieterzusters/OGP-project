@@ -108,5 +108,21 @@ public class Asteroid extends SpaceObject {
 	 */
 	private Random random;
 	
+	public void resolve(SpaceObject spaceobject)
+	{
+		if(spaceobject instanceof Asteroid)
+		{
+			resolveCollision(spaceobject);
+		}
+		
+		if(spaceobject instanceof Bullet || spaceobject instanceof Ship)
+		{
+			Die();
+			spaceobject.Die();
+		}
+		
+		
+	}
+	
 
 }
