@@ -1,11 +1,9 @@
 package asteroids.test;
 
 import static org.junit.Assert.*;
-import java.lang.Math;
-
-import asteroids.model.Ship;
-
 import org.junit.*;
+import java.lang.Math;
+import asteroids.model.*;
 import org.hamcrest.core.*;
 
 import asteroids.Util;
@@ -15,11 +13,12 @@ public class ShipTest {
 	private static final double SPEEDOFLIGHT = 300000;
 	private static Ship staticShip1;
 	private static Ship staticShip2;
-	private static Ship dynamicShip1;
-	private static Ship dynamicShip2;
 	private static Ship staticShip3;
 	private static Ship staticShip4;
+	private static Ship dynamicShip1;
+	private static Ship dynamicShip2;
 	private static Ship collisionShip1;
+	private static World testWorld;
 
 	
 
@@ -38,18 +37,20 @@ public class ShipTest {
 	public void setUp()  {
 		dynamicShip1 = new Ship(50, 2000, 10, 5, 20, 1,2);
 		dynamicShip2 = new Ship(-30.5, -20.1,-100, 200, 15, 3, 55);
+		testWorld = new World(1000, 1000);
 	
 		
 	}
 
 	@Test
-	public void constructorIllegalSpeedTest() {
+	public void constructor_IllegalSpeedTest() {
 		Ship newShip = new Ship(10, 10, 250000, 250000, 15, 0, 50);
 		assertTrue ("Speed has not been adjusted properly", Util.fuzzyLessThanOrEqualTo(newShip.getVelocity(), newShip.getSpeedLimit() ));
 	}
 	
+	
 	@Test
-	public void constructorIllegalRadiusTest() {
+	public void constructor_IllegalRadiusTest() {
 		
 		try {
 			@SuppressWarnings("unused")
@@ -65,6 +66,7 @@ public class ShipTest {
 		assertEquals("Expected a value of 100 for staticShip1", 100 ,staticShip1.getX(),Util.EPSILON);
 		assertEquals("Expected a value of -100 for staticShip2", -100, staticShip2.getX(), Util.EPSILON);
 	}
+	
 	
 	@Test
 	public void getYTest() {

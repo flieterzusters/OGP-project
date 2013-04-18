@@ -20,10 +20,11 @@ import asteroids.Util;
  * @invar The velocity of each space ship must be valid.
  * 		  | isValidVelocity()
  * 
+ * 
  * @author Tom
  * @version 0.1
  */
-abstract public class SpaceObject {
+public abstract class SpaceObject {
 	
 	/**
 	 * Initializes a space object with a given position, velocity and radius.
@@ -150,18 +151,21 @@ abstract public class SpaceObject {
 	 * 		| new this.getY() = this.getY() + getYVelocity*dt	 
 	 */
 	
-	public void move(double dt) {	
+	public void move(double dt){	
 		
+		if (dt>0){
+		setXPos(getX() + this.getXVelocity()*dt);
+		setYPos(getY() + this.getYVelocity()*dt);
 		
-		xPos = xPos + this.getXVelocity()*dt;
-		yPos = yPos + this.getYVelocity()*dt;
+		if (this instanceof Ship) {
+			Ship ship = (Ship) this;
+			ship.thrust(dt);
+		}}
 		
-		if(Ship.class.isAssignableFrom(this.getClass())){
-
-			((Ship)this).thrust(dt);}
 		
 		
 	}
+	
 	
 	/**
 	 * @return The space object's current velocity in the x-direction(km/s).
@@ -332,9 +336,8 @@ abstract public class SpaceObject {
 	/**
 	 * @return Total mass of the space object.
 	 */
+	@Basic @Immutable
 	public abstract double getMass();
-		
-	
 	
 	/**
 	 * The current mass of the space object.
@@ -350,7 +353,7 @@ abstract public class SpaceObject {
 	public double getDistanceBetween(SpaceObject secondObject) {
 		
 		double centerDistanceSquared = Math.pow(secondObject.getX()-this.getX() , 2) + Math.pow(secondObject.getY()-this.getY(), 2);
-		return Math.sqrt(centerDistanceSquared) - getSumOfRadii(secondObject);
+		return Math.sqrt(centerDistanceSquared);
 		
 	}
 
@@ -366,7 +369,7 @@ abstract public class SpaceObject {
 		double distance = this.getDistanceBetween(secondObject);
 		double sumOfRadius = getSumOfRadii(secondObject);
 		
-		if(Util.fuzzyLessThanOrEqualTo(distance, sumOfRadius))	{
+		if(distance < sumOfRadius)	{
 			return true;
 		}
 		
@@ -429,6 +432,15 @@ abstract public class SpaceObject {
 		
 	}
 	
+	/**
+	 * Resolves the collision between two ships or two asteroids by bouncing them off each other.
+	 * @param secondObject
+	 * 				The second object with which this object collides.
+	 * 
+	 * @post The speed of this object will be updated to resolve the collision.
+	 * 			|new.getXVelocity() = 
+	 */
+	
 	public void resolveCollision (SpaceObject secondObject) {
 		
 		if (secondObject == null) { throw new NullPointerException(); }
@@ -457,17 +469,32 @@ abstract public class SpaceObject {
 		
 		
 	
-	
+	/**
+	 * Terminates this object. The object will be removed from its current world.
+	 * 
+	 * @post If this object is in a world, it will be removed from that world.
+	 * 			| getWorld().removeObject(this)
+	 * 			| removeWorld()
+	 */
 	protected void Die() {
 		
 		if(this.getWorld() != null) {
 		this.getWorld().removeObject(this);
 		this.removeWorld();
 		}
+		else {throw new NullPointerException();}
 		
 			
 	}
 	
+	/**
+	 * Returns the time (in seconds) when the object will collide with a boundary of his world.
+	 * @return Positive_infinity if the object doesn't collide with a boundary.
+	 * 			| if (getXvelocity() == 0 && getYVelocity() == 0)
+	 * 			| then result = Double.POSITIVE_INFINITY
+	 * @return The time (in seconds) when the object will collide with a boundary of his world.
+	 * 			| 
+	 */
 	public double getTimeToBoundaryCollision() {
 		
 		double worldwidth = getWorld().getWorldWidth();
@@ -512,17 +539,23 @@ abstract public class SpaceObject {
 	public void resolveBoundaryCollision()
 	{
 		
-		if(Util.fuzzyEquals(this.getX(), this.getRadius()) || 
-				Util.fuzzyEquals(this.getX(), this.getWorld().getWorldWidth()-this.getRadius())) {
+		if(Math.abs(getX() - getRadius()) < Util.EPSILON || 
+				Math.abs(getX() + getRadius() - getWorld().getWorldWidth()) < Util.EPSILON) {
 			
-			this.xVelocity = -(this.getXVelocity());}
+			setXVelocity(-(this.getXVelocity()));}
 		
 		else {
-			this.yVelocity = -(this.getYVelocity());}
+			setYVelocity(-(this.getYVelocity()));}
 		
-			
+		makeVelocityValid(getXVelocity(),getYVelocity());
+		
 	}
 	
+	/**
+	 * Resolves the collision between this space object and another space object.
+	 * @param collisionobject
+	 * 				The space object in collision with this space object.
+	 */
 	public abstract void resolve(SpaceObject collisionobject);
 	
 }

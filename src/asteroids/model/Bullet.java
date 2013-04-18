@@ -15,6 +15,9 @@ import asteroids.Util;
  * @invar A bullet's speed can never exceed it's speed limit. 
  * 	      | getBulletVelocity =< getBulletSpeedLimit
  * 
+ * @invar The source of this bullet must be valid at all times.
+ * 		  | isValidSource(getSource())
+ * 
  * @author Tom De Ferm
  * @version 0.1
  */
@@ -23,19 +26,34 @@ public class Bullet extends SpaceObject {
 	
 	/**
 	 * Creates a new Bullet with user defined parameters.
-	 * @param x	The initial x-coordinate of the bullet, expressed in km.
-	 * @param y	The initial y-coordinate of the bullet, expressed in km.
-	 * @param xBulletVelocity The initial velocity in the x-direction the bullet will have, expressed in km/s.
-	 * @param yBulletVelocity The initial velocity in the y-direction the bullet will have, expressed in km/s.
-	 * @param radius The bullet's radius, expressed in km.
-	 * @param asteroidMass The bullet's mass, expressed in kg.
+	 * @param x	
+	 * 		  The initial x-coordinate of the bullet, expressed in km.
+	 * @param y	
+	 * 		  The initial y-coordinate of the bullet, expressed in km.
+	 * @param xVelocity 
+	 * 		  The initial velocity in the x-direction the bullet will have, expressed in km/s.
+	 * @param yVelocity 
+	 * 		  The initial velocity in the y-direction the bullet will have, expressed in km/s.
+	 * @param radius 
+	 * 		  The bullet's radius, expressed in km.
+	 * @param mass
+	 * 		  The mass of this bullet.
+	 * @param source
+	 * 		  The source of this bullet.
+	 * 
+	 *  @effect This new bullet is initialized as a SpaceObject with a given position, speed, radius and mass.
+	 *        | super(x, y, xVelocity, yVelocity, radius, mass)
+	 *        
+	 * @post The given source is set as the source of this bullet.
+	 * 		  | new.getSource() == source
 	 */
 	
 	public Bullet(double x, double y, double xVelocity,
 			double yVelocity, Ship source) {
 		
 		super(x, y, xVelocity, yVelocity, minimumRadius);
-		setSource(source);
+		if(isValidSource(source)){
+			this.source = source;}
 		}
 	
 	/**
@@ -64,14 +82,23 @@ public class Bullet extends SpaceObject {
 	 * Returns the ship from which this bullet is fired.
 	 * @return The ship from which this bullet is fired.
 	 */
+	@Basic @Immutable
 	public Ship getSource() {
 		
 		return source;
 	}
 	
-	private void setSource(Ship source) {
-		
-		this.source = source; 
+	/**
+	 * Checks whether the source is a valid source.
+	 * @param source
+	 * 			The source to check.
+	 * @return True if the given source is valid, false if it isn't.
+	 * 			| result = (source != null)
+	 * 
+	 */
+	private boolean isValidSource(Ship source)
+	{
+		return (source != null);
 	}
 	
 	/**
@@ -131,24 +158,19 @@ public class Bullet extends SpaceObject {
 	@Override
 	public void resolve(SpaceObject spaceobject)
 	{
-		if(spaceobject instanceof Bullet || spaceobject instanceof Asteroid) 
+		if(spaceobject == source) 
 		{
 			this.Die();
-			spaceobject.Die();
 		}
 		
-		if(spaceobject instanceof Ship)
+		else
 		{
-			if(this.getSource().equals(spaceobject))
-			{
 				Die();
-			}
-			else 
-			{
 				spaceobject.Die();
-			}
-			
 		}
+			
+			
+		
 			
 	}
 

@@ -151,6 +151,7 @@ public class World {
 	 * 
 	 * @param ship 		The space object that is added to this world.
 	 */
+	
 	public void addObject (SpaceObject object) throws IllegalObjectException {
 		
 		if(object == null) {throw new NullPointerException();}
@@ -179,8 +180,22 @@ public class World {
 		boolean validSpaceObject = true;
 		for(SpaceObject spaceobject : Objects)
 		{
-			if (object.overlap(spaceobject)) { validSpaceObject=false;}
+			if(object instanceof Bullet)
+			{
+				if (object.overlap(spaceobject) && ((Bullet) object).getSource() != spaceobject)
+				{
+					spaceobject.Die();
+					object.Die();
+					validSpaceObject = false;
+				}
+			}
+			
+			else if(object.overlap(spaceobject))
+			{
+				validSpaceObject=false;
+			}
 		}
+		
 		return validSpaceObject;
 	}
 	

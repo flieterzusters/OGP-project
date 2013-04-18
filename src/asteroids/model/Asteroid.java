@@ -1,5 +1,6 @@
 package asteroids.model;
 
+import asteroids.Util;
 import be.kuleuven.cs.som.annotate.Basic;
 import java.util.Random;
 import be.kuleuven.cs.som.annotate.Immutable;
@@ -24,75 +25,144 @@ public class Asteroid extends SpaceObject {
 	
 	/**
 	 * Creates a new Asteroid with user defined parameters.
-	 * @param x	The initial x-coordinate of the asteroid, expressed in km.
-	 * @param y	The initial y-coordinate of the asteroid, expressed in km.
-	 * @param xAsteroidVelocity The initial velocity in the x-direction the asteroid will have, expressed in km/s.
-	 * @param yAsteroidVelocity The initial velocity in the y-direction the asteroid will have, expressed in km/s.
-	 * @param radius The asteroid's radius, expressed in km.
-	 * @param asteroidMass The asteroid's mass, expressed in kg.
+	 * @param x	
+	 * 		  The initial x-coordinate of the asteroid, expressed in km.
+	 * @param y	
+	 * 		  The initial y-coordinate of the asteroid, expressed in km.
+	 * @param xVelocity 
+	 * 		  The initial velocity in the x-direction the asteroid will have, expressed in km/s.
+	 * @param yVelocity 
+	 * 		  The initial velocity in the y-direction the asteroid will have, expressed in km/s.
+	 * @param radius 
+	 * 		  The asteroid's radius, expressed in km.
+	 * 
+	 * @effect This new asteroid is initialized as a SpaceObject with a given position, speed and radius.
+	 *        | super(x, y, xVelocity, yVelocity, radius)
+	 *        
+	 * @post The given random is now set as a random of this asteroid.
+	 * 		  | new.getRandom() == random
+	 * 
 	 */
-	
-	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius) 
-	{
-		super(x, y, xVelocity, yVelocity, radius);
-		
-	}
 	
 	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius, Random random)
 	{
 		super(x, y, xVelocity, yVelocity, radius);
 		setRandom(random);
+	
+		
+	}
+	
+	/**
+	 * Creates a new Asteroid with user defined parameters.
+	 * @param x	
+	 * 		  The initial x-coordinate of the asteroid, expressed in km.
+	 * @param y	
+	 * 		  The initial y-coordinate of the asteroid, expressed in km.
+	 * @param xVelocity 
+	 * 		  The initial velocity in the x-direction the asteroid will have, expressed in km/s.
+	 * @param yVelocity 
+	 * 		  The initial velocity in the y-direction the asteroid will have, expressed in km/s.
+	 * @param radius 
+	 * 		  The asteroid's radius, expressed in km.
+	 * 
+	 * @effect This new asteroid is initialized as a SpaceObject with a given position, speed and radius.
+	 *        | super(x, y, xVelocity, yVelocity, radius)
+	 *        
+	 * 
+	 * 
+	 */
+	
+	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius) 
+	{
+		this(x, y, xVelocity, yVelocity, radius, new Random());
 		
 	}
 	
 	
-	@Override
+	
+	/**
+	 * @return The current mass of this asteroid.
+	 * 			| (4/3)*Math.PI*Math.pow(getRadius(), 3)*getMassDensity()
+	 */
+	@Override @Immutable
 	public double getMass() {
 		
-		double Mass = (4/3)*Math.PI*massDensity*Math.pow(getRadius(), 3);
+		double Mass = (4/3)*Math.PI*Math.pow(getRadius(), 3)*getMassDensity();
 		return Mass;
 	}
 	
+	/**
+	 * @return The mass density of this asteroid.
+	 */
+	@Basic @Immutable
+	public double getMassDensity() {
+		return massDensity;
+	}
 	
 	/**
 	 * The mass density of each Asteroid is fixed (in kg/km³).
 	 */
-	private static final double massDensity = 2.65*Math.pow(10, 12);
+	private static final double massDensity = 2.65*Math.pow(10,12);
 	
+	/**
+	 * Terminates this object. The object will be removed from its current world.
+	 * 		| getWorld().removeObject(this)
+	 * 		| removeWorld()
+	 * If the radius of this object is greater than or equal to 30, two smaller child asteroids will spawn.
+	 * 		| if (getRadius() >= 30)
+	 * 		| let
+	 * 		| 		childradius = (this.getRadius())/(2)
+	 * 		|		xPosChild1 = this.getX()+childradius*Math.cos(randomDouble)
+	 * 		|		yPosChild1 = this.getY()+childradius*Math.sin(randomDouble)
+	 * 		|		xPosChild2 = this.getX()-childradius*Math.cos(randomDouble)
+	 * 		|		yPosChild2 = this.getY()-childradius*Math.sin(randomDouble)
+	 * 		|		childXVelocity = childVelocity*Math.cos(randomDouble)
+	 * 		|		childYVelocity = childVelocity*Math.sin(randomDouble)
+	 * 		| in
+	 * 		|		getWorld().addObject(new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius, getRandom()))
+	 * 		|		getWorld().addObject(new Asteroid(xPosChild2, yPosChild2, -childXVelocity, -childYVelocity, childradius, getRandom()))
+	 */
 	public void Die() {
 		
-		if(this.getWorld() != null) {
-			this.getWorld().removeObject(this);
-			this.removeWorld();
-		}
+		World world = getWorld();
 		
-		if (getRandom() != null && this.getRadius() >= 30)
+		if(world == null || getRadius() < 30)
 		{
-			double randomDouble = getRandom().nextDouble();
-			double childradius = (this.getRadius())/(2);
-			double childVelocity = (1.5)*(this.getVelocity());
-			double childXVelocity = childVelocity*Math.cos(randomDouble);
-			double childYVelocity = childVelocity*Math.sin(randomDouble);
-			double xPosChild1 = this.getX()+childradius*Math.cos(randomDouble);
-			double yPosChild1 = this.getY()+childradius*Math.sin(randomDouble);
-			double xPosChild2 = this.getX()-childradius*Math.cos(randomDouble);
-			double yPosChild2 = this.getY()-childradius*Math.sin(randomDouble);
-			
-			SpaceObject Child1 = new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius, getRandom());
-			SpaceObject Child2 = new Asteroid(xPosChild2, yPosChild2, -childXVelocity, -childYVelocity, childradius, getRandom());
-			
-			Child1.setWorld(this.getWorld());
-			Child2.setWorld(this.getWorld());
-			this.getWorld().addObject(Child1);
-			this.getWorld().addObject(Child2);
+			super.Die();
+			return;
 		}
 		
-		else {
-			super.Die();
-		}
+		double childradius = (getRadius())/(2);
+		
+		// Create Child 1
+		
+		double direction = Math.PI*(random.nextDouble());
+		
+		double xPosChild1 = this.getX()+(childradius+Util.EPSILON)*Math.cos(direction);
+		double yPosChild1 = this.getY()+(childradius+Util.EPSILON)*Math.sin(direction);
+		double childVelocity = (1.5)*(getVelocity());
+		double childXVelocity = childVelocity*Math.cos(direction);
+		double childYVelocity = childVelocity*Math.sin(direction);
+		SpaceObject Child1 = new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius);
+		
+		// Create Child 2
+		
+		double xPosChild2 = this.getX()-(childradius)*Math.cos(direction);
+		double yPosChild2 = this.getY()-(childradius)*Math.sin(direction);
+		SpaceObject Child2 = new Asteroid(xPosChild2, yPosChild2, childXVelocity*(-1), childYVelocity*(-1), childradius);
 			
+		world.removeObject(this);
+		removeWorld();
+		world.addObject(Child1);
+		world.addObject(Child2);
+			
+		Child1.setWorld(world);
+		Child2.setWorld(world);
+			
+		
 	}
-	
+		
+			
 	public Random getRandom()
 	{
 		return random;
@@ -100,7 +170,9 @@ public class Asteroid extends SpaceObject {
 	
 	public void setRandom(Random random) {
 		
-		this.random = random;
+		if(random == null) {this.random = new Random();}
+		else{
+		this.random = random;}
 	}
 	
 	/**
@@ -115,9 +187,14 @@ public class Asteroid extends SpaceObject {
 			resolveCollision(spaceobject);
 		}
 		
-		if(spaceobject instanceof Bullet || spaceobject instanceof Ship)
+		if(spaceobject instanceof Bullet)
 		{
-			Die();
+			spaceobject.Die();
+			Die();	
+		}
+		
+		if(spaceobject instanceof Ship)
+		{
 			spaceobject.Die();
 		}
 		

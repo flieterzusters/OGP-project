@@ -246,9 +246,8 @@ public class Ship extends SpaceObject {
 	/**
 	 * The ship fires a bullet.
 	 * 
-	 * @post If this ship is in a world, a bullet will be placed in front of the ship.
-	 * 		 | if (this.getWorld() != null)
-	 * 		 | bullet = new Bullet()
+	 * @effect A new bullet is added to the world of this ship with a new position, new velocity and this ship as its source.
+	 * 			| getWorld().addObject(bullet)
 	 */
 	
 	public void fireBullet() {
@@ -257,14 +256,29 @@ public class Ship extends SpaceObject {
 		
 		double bulletRadius = 3;
 		double bulletSpeed = 250;
-		double bulletXPos = Math.cos(this.getDirection())*(this.getRadius()+ bulletRadius);
-		double bulletYPos = Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
+		double bulletXPos = this.getX() + Math.cos(this.getDirection())*(this.getRadius()+ bulletRadius);
+		double bulletYPos = this.getY() + Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
 		double bulletXVelocity = Math.cos(this.getDirection())* bulletSpeed;
 		double bulletYVelocity = Math.sin(this.getDirection())* bulletSpeed;
 		Bullet bullet = new Bullet(bulletXPos, bulletYPos, bulletXVelocity, bulletYVelocity, this);
 		this.getWorld().addObject(bullet);
 	}
 	
+	/**
+	 * Resolves the collision between this ship and another space object.
+	 * @param spaceobject
+	 * 				The space object in collision with this ship.
+	 * 
+	 * @post If the other space object is a ship, the ships will bounce off each other.
+	 * 			| if (spaceobject instanceof Ship)
+	 * 			| then resolveCollision(spaceobject);
+	 * @post If the other space object is an Asteroid, this ship dies and the asteroid remains unaffected.
+	 * 			| if (spaceobject instanceof Asteroid)
+	 * 			| then Die();
+	 * @post If the other space object is a Bullet, the resolve method will be called on this bullet.
+	 * 			| if (spaceobject instanceof Bullet)
+	 * 			| then spaceobject.resolve(this);
+	 */
 	@Override
 	public void resolve(SpaceObject spaceobject)
 	{
@@ -272,8 +286,7 @@ public class Ship extends SpaceObject {
 			resolveCollision(spaceobject);}
 		
 		if(spaceobject instanceof Asteroid) {
-			this.Die();
-			spaceobject.Die();}
+			this.Die();}
 		
 		if(spaceobject instanceof Bullet) {
 			spaceobject.resolve(this);}
