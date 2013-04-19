@@ -269,15 +269,15 @@ public class Ship extends SpaceObject {
 	 * @param spaceobject
 	 * 				The space object in collision with this ship.
 	 * 
-	 * @post If the other space object is a ship, the ships will bounce off each other.
+	 * @effect If the other space object is a ship, the ships will bounce off each other.
 	 * 			| if (spaceobject instanceof Ship)
-	 * 			| then resolveCollision(spaceobject);
-	 * @post If the other space object is an Asteroid, this ship dies and the asteroid remains unaffected.
+	 * 			| then resolveCollision(spaceobject)
+	 * @effect If the other space object is an Asteroid, this ship dies and the asteroid remains unaffected.
 	 * 			| if (spaceobject instanceof Asteroid)
-	 * 			| then Die();
-	 * @post If the other space object is a Bullet, the resolve method will be called on this bullet.
+	 * 			| then Die()
+	 * @effect If the other space object is a Bullet, the resolve method will be called on this bullet.
 	 * 			| if (spaceobject instanceof Bullet)
-	 * 			| then spaceobject.resolve(this);
+	 * 			| then spaceobject.resolve(this)
 	 */
 	@Override
 	public void resolve(SpaceObject spaceobject)

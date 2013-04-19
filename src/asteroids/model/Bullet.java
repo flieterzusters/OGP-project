@@ -142,7 +142,9 @@ public class Bullet extends SpaceObject {
 	private static final double bulletSpeed = 250;
 	
 	/**
-	 * 
+	 * Resolves the collision between this bullet and a boundary.
+	 * If the bullet hits a boundary for the second time, it dies.
+	 * Otherwise it will bounce off the wall like any other space object.
 	 */
 	@Override
 	public void resolveBoundaryCollision()
@@ -155,6 +157,18 @@ public class Bullet extends SpaceObject {
 			
 	}
 	
+	/**
+	 * Resolves the collision between this bullet and another space object.
+	 * @param spaceobject
+	 * 			he space object in collision with this bullet.
+	 * 
+	 * @effect If spaceobject is the source of this bullet, only this bullet will die.
+	 * 		   Otherwise both the bullet and the spaceobject will die.
+	 * 			|if(spaceobject == source)	then this.Die()
+	 * 			|else
+	 * 			|	Die()
+	 * 			|	spaceobject.Die()
+	 */
 	@Override
 	public void resolve(SpaceObject spaceobject)
 	{

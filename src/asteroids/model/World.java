@@ -13,7 +13,8 @@ import java.util.HashSet;
  * A class of virtual game worlds with certain width and height.
  * A game world contains ships, bullets and asteroids.
  * 
- * 
+ * @invar 		|isValidCoordinate(getWorldWidth())
+ * @invar		|isValidCoordinate(getWorldHeight())
  * 
  * @author Tom De Ferm
  * @version 0.1
@@ -73,7 +74,6 @@ public class World {
 		else {height = newHeight;}
 	}
 	
-	// TO DO: Testen of <0 geen probleem vormt.
 	private boolean isValidCoordinate(double coordinate) {
 		
 		if(Double.isNaN(coordinate) || !Util.fuzzyLessThanOrEqualTo(coordinate, Double.MAX_VALUE)) return false;
@@ -175,6 +175,13 @@ public class World {
 		Objects.remove(object);
 	}
 	
+	/**
+	 * Checks whether the space object is valid, to be added to this game world.
+	 * @param object
+	 * 			The space object to be checked.
+	 * @return True if the space object is valid. This means it doens't overlap with any other space object in this world.
+	 */
+	
 	private boolean isValidSpaceObject(SpaceObject object) {
 		
 		boolean validSpaceObject = true;
@@ -200,15 +207,59 @@ public class World {
 	}
 	
 	
-	/**0
+	/**
 	 * A collection of all the space objects in the world.
 	 */
 	private Set<SpaceObject> Objects;
 	
 	/**
-	 * 
+	 * Evolves the world for an amount of time dt.
 	 * @param dt
-	 * @param collisionListener
+	 * 			The amount of the time the world has to evolve.
+	 * 
+	 * @effect 	|while(true)
+	 * 			|	timeToFirstCollision = Double.POSITIVE_INFINITY
+	 * 			|	collisionObject1=null
+	 * 			|	collisionObject2=null
+	 * 			|	
+	 * 			|	for each (SpaceObject spaceobject1 : Objects)
+	 * 			|		for each (SpaceObject spaceobject2 : Objects)
+	 * 			|			
+	 * 			|			if(!spaceobject1.equals(spaceobject2))
+	 * 			|				then double timeToCollision = spaceobject1.getTimeToCollision(spaceobject2)
+	 * 			|				
+	 * 			|				if(timeToCollision<timeToFirstCollision)
+	 * 			|						then timeToFirstCollision = timeToCollision
+	 * 			|							 collisionObject1 = spaceobject1
+	 * 			|						     collisionObject2 = spaceobject2
+	 * 			|		
+	 * 			|		if(spaceobject1.getTimeToBoundaryCollision() < timeToFirstCollision)
+	 * 			|			then timeToFirstCollision = spaceobject1.getTimeToBoundaryCollision()
+	 * 			|				 collisionObject1 = spaceobject1
+	 * 			|				 collisionObject2 = null
+	 * 			|
+	 * 			|	if(timeToFirstCollision > dt) then break;
+	 * 			|
+	 * 			| 	for each (SpaceObject spaceobject : Objects)
+	 * 			|		spaceobject.move(timeToFirstCollision)
+	 * 			|
+	 * 			| 	if(timeToFirstCollision == Double.POSITIVE_INFINITY) then break;
+	 * 			|
+	 * 			|	else if (collisionObject2 == null)
+	 * 			|		then collisionObject1.resolveBoundaryCollision()
+	 * 			|
+	 * 			|	else
+	 * 			|		collisionObject1.resolve(collisionObject2)
+	 * 			|
+	 * 			|	dt = dt - timeToFirstCollision
+	 * 			|
+	 * 			| for each (SpaceObject spaceobject : Objects)
+	 * 			|	spaceobject.move(timeToFirstCollision)
+	 * 
+	 * @throws IllegalArgumentException
+	 * 				Only if dt isn't a valid evolve argument. (see method: isValidEvolveArgument)
+	 * 
+	 * 
 	 */
 	public void evolve(double dt) throws IllegalArgumentException {
 		
@@ -284,7 +335,12 @@ public class World {
 		
 	}
 	
-			
+	/**
+	 * Checks whether the argument is a valid argument for the method "evolve".		
+	 * @param argument
+	 * 			The argument to be checked.
+	 * @return True if the argument is a number and greater than zero, else false will be returned.
+	 */
 	private boolean isValidEvolveArgument(double argument) {	
 		
 		if (Double.isNaN(argument) || argument <= 0) {

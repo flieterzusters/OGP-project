@@ -170,4 +170,16 @@ public class ShipTest {
 		double[] array = collisionShip1.getCollisionPosition(dynamicShip1);
 		assertTrue("Expected True", array == null);
 	}
+	
+	@Test (expected=NullPointerException.class)
+	public void fireBullet_Null() {
+		staticShip1.fireBullet();
+		
+	}
+	
+	@Test
+	public void fireInWorld() {
+		testWorld.addObject(dynamicShip1);
+		dynamicShip1.fireBullet();
+	}
 }

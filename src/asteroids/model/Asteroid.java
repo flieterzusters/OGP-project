@@ -161,13 +161,22 @@ public class Asteroid extends SpaceObject {
 			
 		
 	}
-		
-			
+	
+	/**
+	 * Returns a random object.
+	 * @return A random object.
+	 */
+	@Basic		
 	public Random getRandom()
 	{
 		return random;
 	}
 	
+	/**
+	 * Sets a random object as the random object of the ship.
+	 * @param random
+	 * 			A random object.
+	 */
 	public void setRandom(Random random) {
 		
 		if(random == null) {this.random = new Random();}
@@ -180,6 +189,24 @@ public class Asteroid extends SpaceObject {
 	 */
 	private Random random;
 	
+	/**
+	 * Resolves the collision between this asteroid and another space object.
+	 * @param spaceobject
+	 * 		The space object in collision with this asteroid.
+	 * 
+	 * @effect If the other space object is an asteroid, the asteroids will bounce off each other.
+	 * 			|if(spaceobject instanceof Asteroid)
+	 * 			|	then resolveCollision(spaceobject)
+	 * @effect If the other space object is a bullet, both objects die.
+	 *  		|if(spaceobject instanceof Bullet)
+	 *  		|then
+	 *  		|	spaceobject.Die()
+	 *  		|	Die()
+	 * @effect If the other spaceobject is a ship, the ship will die and the asteroid remains unaffected.
+	 *  		| if (spaceobject instanceof Ship)
+	 *  		|then spaceobject.Die()
+	 */
+	@Override
 	public void resolve(SpaceObject spaceobject)
 	{
 		if(spaceobject instanceof Asteroid)

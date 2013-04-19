@@ -347,8 +347,12 @@ public abstract class SpaceObject {
 	/**
 	 * Returns the distance between this space object and the given space object. This distance is the shortest distance the space objects would have to move
 	 * to be adjacent to each other. When the given space object is the same as this space object, the distance is zero, when the space objects overlap, the distance is negative.
-	 * @param secondObject The space object to which the distance should be calculated.
+	 * @param secondObject 
+	 * 				The space object to which the distance should be calculated.
+	 * 
 	 * @return The distance between the 2 space objects. The distance is negative if and only if the space objects overlap.
+	 * 			|double centerDistanceSquared = Math.pow(secondObject.getX()-this.getX() , 2) + Math.pow(secondObject.getY()-this.getY(), 2)
+	 * 			|return Math.sqrt(centerDistanceSquared)
 	 */
 	public double getDistanceBetween(SpaceObject secondObject) {
 		
@@ -361,8 +365,15 @@ public abstract class SpaceObject {
 	
 	/**
 	 * Returns true if and only if this space object overlaps with the given space object. A space object always overlaps with itself. Two adjacent space objects are considered to overlap.
-	 * @param secondObject The space object to check for overlap with.
-	 * @return True if this space object overlaps with the given space object, False if the ships do not overlap.
+	 * @param secondObject 
+	 * 			The space object to check for overlap with.
+	 * 
+	 * @return True if this space object overlaps with the given space object, False if the space objects do not overlap.
+	 * 			|double distance = this.getDistanceBetween(secondObject)
+	 * 			|double sumOfRadius = getSumOfRadii(secondObject)
+	 * 			|
+	 * 			|if(distance < sumOfRadius) then return true
+	 * 			|else 	return false
 	 */
 	public boolean overlap(SpaceObject secondObject) {
 		
@@ -381,9 +392,22 @@ public abstract class SpaceObject {
 	/**
 	 * Returns the time left (in seconds) before this space object collides for the first time with the given space object or Double.POSITIVE_INTINITY if they never collide.
 	 * A space object can never collide with itself.
-	 * @param secondObject The space object to which the collision time should be calculated.
+	 * @param secondObject 
+	 * 				The space object to which the collision time should be calculated.
+	 * 
 	 * @return The time, in seconds, to collision with the given space object.
 	 * 		   Double.POSITIVE_INFINITY if they don't collide.
+	 * 			|double sigmaSquared = Math.pow(getSumOfRadii(secondObject), 2)
+	 * 			|double deltaVSquared = Math.pow(secondObject.getXVelocity() - this.getXVelocity(), 2) + Math.pow(secondObject.getYVelocity() - this.getYVelocity(), 2)
+	 * 			|double deltaRSquared = Math.pow(secondObject.getX() - this.getX(), 2) + Math.pow(secondObject.getY() - this.getY(), 2)
+	 * 			|double deltaVDeltaR = (secondObject.getXVelocity() - this.getXVelocity())*(secondObject.getX() - this.getX()) + (secondObject.getYVelocity() - this.getYVelocity())*(secondObject.getY() - this.getY())
+	 * 			|double d  = Math.pow(deltaVDeltaR, 2) - deltaVSquared*(deltaRSquared - sigmaSquared)
+	 * 			|double deltaT
+	 * 			|
+	 * 			|if(Util.fuzzyEquals(deltaVDeltaR, 0) || deltaVDeltaR > 0 ) then deltaT = Double.POSITIVE_INFINITY
+	 * 			|else if(Util.fuzzyLessThanOrEqualTo(d, 0)) then deltaT = Double.POSITIVE_INFINITY
+	 * 			|else 	deltaT = -(deltaVDeltaR + Math.sqrt(d))/(deltaVSquared)
+	 * 			|return deltaT
 	 */
 	
 	public double getTimeToCollision(SpaceObject secondObject) {
@@ -406,39 +430,72 @@ public abstract class SpaceObject {
 	}
 	
 	/**
-	 * Returns the position of the collision with the given space object or Double.POSITIVE_INTINITY if they never collide.
+	 * Returns the position of the collision with the given space object or Double.POSITIVE_INFINITY if they never collide.
 	 * A space object can never collide with itself.
-	 * @param secondObject The space object to which the collision position should be calculated.
-	 * @return The position of the collision with the given space object.
+	 * @param secondObject 
+	 * 			The space object to which the collision position should be calculated.
+	 * 
+	 * @return The position of the collision with the given space object or Double.POSITIVE_INFINITY if they never collide.
+	 * 			|if (deltaT == Double.POSITIVE_INFINITY)
+	 * 			|	then return null
+	 * 			|
+	 * 			|double[] collisionPos = new double[2]
+	 * 			|double theta = Math.atan2(secondObject.getY()-this.getY(), secondObject.getX()-this.getX())
+	 * 			|if((secondObject.getX()-this.getX())<0)
+	 * 			|	theta+=Math.PI*2
+	 * 			|
+	 * 			|collisionPos[0] = this.getX() + this.radius * Math.cos(theta)
+	 * 			|collisionPos [1] = this.getY() + this.radius * Math.sin(theta)
+	 * 			|return collisionPos
+	 * 
+	 * @throws NullPointerException
+	 * 				If the second object is null.
 	 */
 	
 	public double[] getCollisionPosition(SpaceObject secondObject) {
 		if (secondObject == null) throw new NullPointerException();
-		else {
-			double deltaT = getTimeToCollision(secondObject);
-			if(deltaT == Double.POSITIVE_INFINITY) return null;
-			else {
-				double[] collisionPos = new double[2];
-				double theta = Math.atan2(secondObject.getY()-this.getY(), secondObject.getX()-this.getX());
-				if ((secondObject.getX()-this.getX())<0) {
-					theta+=Math.PI*2;
-				}
-				collisionPos[0] = this.getX() + this.radius * Math.cos(theta);
-				collisionPos [1] = this.getY() + this.radius * Math.sin(theta);
-				return collisionPos;
+			
+		double deltaT = getTimeToCollision(secondObject);
+		if(deltaT == Double.POSITIVE_INFINITY) return null;
+			
+		double[] collisionPos = new double[2];
+		double theta = Math.atan2(secondObject.getY()-this.getY(), secondObject.getX()-this.getX());
+		if ((secondObject.getX()-this.getX())<0) {
+			theta+=Math.PI*2;
 		}
 		
-		}
-		
+		collisionPos[0] = this.getX() + this.radius * Math.cos(theta);
+		collisionPos [1] = this.getY() + this.radius * Math.sin(theta);
+		return collisionPos;
 	}
+		
+
+		
+	
 	
 	/**
 	 * Resolves the collision between two ships or two asteroids by bouncing them off each other.
 	 * @param secondObject
 	 * 				The second object with which this object collides.
 	 * 
-	 * @post The speed of this object will be updated to resolve the collision.
-	 * 			|new.getXVelocity() = 
+	 * @effect The speed of this object will be updated to resolve the collision.
+	 * 			|double sigma = getSumOfRadii(secondObject)
+	 * 			|double deltaRx = secondObject.getX()-this.getX()
+	 * 			|double deltaRy = secondObject.getY()-this.getY()
+	 * 			|double deltaVx = secondObject.getXVelocity()- this.getXVelocity()
+	 * 			|double deltaVy = secondObject.getYVelocity()-this.getYVelocity()
+	 * 			|double deltaVR = (deltaVx*deltaRx)+(deltaVy*deltaRy)
+	 * 			|
+	 * 			|double J = (2*this.getMass()*secondObject.getMass()*deltaVR)/(sigma*(this.getMass()+secondObject.getMass()))
+	 * 			|double Jx = (J*deltaRx)/(sigma)
+	 * 			|double Jy = (J*deltaRy)/(sigma)
+	 * 			|
+	 * 			|(new this).getXVelocity = this.getXVelocity + Jx/this.getMass()
+	 * 			|(new this).getYVelocity = this.getYVelocity + Jy/this.getMass()
+	 * 
+	 * @throws NullPointerException
+	 * 				If the second space object is null.
+	 * 					|(secondObject == null)
 	 */
 	
 	public void resolveCollision (SpaceObject secondObject) {
@@ -472,7 +529,7 @@ public abstract class SpaceObject {
 	/**
 	 * Terminates this object. The object will be removed from its current world.
 	 * 
-	 * @post If this object is in a world, it will be removed from that world.
+	 * @effect If this object is in a world, it will be removed from that world.
 	 * 			| getWorld().removeObject(this)
 	 * 			| removeWorld()
 	 */
@@ -493,7 +550,30 @@ public abstract class SpaceObject {
 	 * 			| if (getXvelocity() == 0 && getYVelocity() == 0)
 	 * 			| then result = Double.POSITIVE_INFINITY
 	 * @return The time (in seconds) when the object will collide with a boundary of his world.
+	 * 			| double worldwidth = getWorld().getWorldWidth()
+	 * 			| double worldheight = getWorld().getWorldHeight()
+	 * 			| double timeToBoundaryX
+	 * 			| double timeToBoundaryY
 	 * 			| 
+	 * 			| if(Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0))
+	 * 			| 	then timeToBoundaryY = Math.abs((getY()- getRadius())/(getYVelocity()))
+	 * 			| 
+	 * 			| else if (!Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0))
+	 * 			| 	then timeToBoundaryY = Math.abs((worldheight - getY() - getRadius())/(getYVelocity()))
+	 * 			| 
+	 * 			| else	
+	 * 			| 	timeToBoundaryY = Double.POSITIVE_INFINITY;
+	 *			|
+	 *			| if(Util.fuzzyLessThanOrEqualTo(this.getXVelocity(),0))
+	 *			| 	then timeToBoundaryX = Math.abs((getX()- getRadius())/(getXVelocity()))
+	 *			|
+	 *			| else if (!Util.fuzzyLessThanOrEqualTo(this.getXVelocity(),0))
+	 *			| 	timeToBoundaryX = Math.abs((worldwidth - getX() - getRadius())/(getXVelocity()))
+	 *			|
+	 *			| else
+	 *			| 	timeToBoundaryX = Double.POSITIVE_INFINITY
+	 *			|
+	 *			| result == Math.min(timeToBoundaryX, timeToBoundaryY)
 	 */
 	public double getTimeToBoundaryCollision() {
 		
@@ -503,11 +583,11 @@ public abstract class SpaceObject {
 		double timeToBoundaryX;
 		double timeToBoundaryY;
 
-		if(this.getYVelocity() < 0) {
+		if(Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0)) {
 			
 			timeToBoundaryY = Math.abs((getY()- getRadius())/(getYVelocity()));}
 		
-		else if (getYVelocity() > 0) {
+		else if (!Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0)) {
 			
 			timeToBoundaryY = Math.abs((worldheight - getY() - getRadius())/(getYVelocity()));
 		}
@@ -516,11 +596,11 @@ public abstract class SpaceObject {
 			timeToBoundaryY = Double.POSITIVE_INFINITY;
 		}
 		
-		if(this.getXVelocity() < 0) {
+		if(Util.fuzzyLessThanOrEqualTo(this.getXVelocity(),0)) {
 			
 			timeToBoundaryX = Math.abs((getX()- getRadius())/(getXVelocity()));}
 		
-		else if (getXVelocity() > 0) {
+		else if (!Util.fuzzyLessThanOrEqualTo(this.getXVelocity(),0)) {
 			
 			timeToBoundaryX = Math.abs((worldwidth - getX() - getRadius())/(getXVelocity()));
 		}
@@ -536,11 +616,28 @@ public abstract class SpaceObject {
 		
 	}
 	
+	/**
+	 * Resolves the collision between this space object and a boundary.
+	 * 
+	 * @effect If the space object hits a horizontal boundary, invert the y-velocity.
+	 * 		   If the space object hits a vertical boundary, invert the x-velocity.
+	 * 			| if(Util.fuzzyEquals(getX(),getRadius()) || Util.fuzzyEquals((getX() + getRadius()), getWorld().getWorldWidth()))
+	 * 			| 	then this.setXVelocity(-(this.getXVelocity()))
+	 * 			|
+	 * 			| else
+	 * 			| 	setYVelocity(-(this.getYVelocity()))
+	 * 			|
+	 * 			| makeVelocityValid(getXVelocity(),getYVelocity())
+	 * 
+	 * @throws NullPointerException
+	 * 				This space object doesn't have a world.
+	 */
 	public void resolveBoundaryCollision()
 	{
+		if(getWorld()==null) throw new NullPointerException();
 		
-		if(Math.abs(getX() - getRadius()) < Util.EPSILON || 
-				Math.abs(getX() + getRadius() - getWorld().getWorldWidth()) < Util.EPSILON) {
+		if(Util.fuzzyEquals(getX(),getRadius()) || 
+				Util.fuzzyEquals((getX() + getRadius()), getWorld().getWorldWidth())) {
 			
 			setXVelocity(-(this.getXVelocity()));}
 		
