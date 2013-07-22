@@ -1,7 +1,7 @@
 package asteroids;
 
 public class Util {
-  public static final double EPSILON = 0.01;
+  public static final double EPSILON = 0.0001;
 
   public static boolean fuzzyEquals(double x, double y) {
     if (Double.isNaN(x) || Double.isNaN(y))

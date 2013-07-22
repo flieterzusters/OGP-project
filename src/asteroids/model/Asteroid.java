@@ -44,9 +44,9 @@ public class Asteroid extends SpaceObject {
 	 * 
 	 */
 	
-	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius, Random random)
+	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius, World world, double minimumRadius, Random random)
 	{
-		super(x, y, xVelocity, yVelocity, radius);
+		super(x, y, xVelocity, yVelocity, radius, world, minimumRadius);
 		setRandom(random);
 	
 		
@@ -138,17 +138,17 @@ public class Asteroid extends SpaceObject {
 		
 		double direction = Math.PI*(random.nextDouble());
 		
-		double xPosChild1 = this.getX()+(childradius+Util.EPSILON)*Math.cos(direction);
-		double yPosChild1 = this.getY()+(childradius+Util.EPSILON)*Math.sin(direction);
-		double childVelocity = (1.5)*(getVelocity());
+		double xPosChild1 = this.getPosition().getX()+(childradius+Util.EPSILON)*Math.cos(direction);
+		double yPosChild1 = this.getPosition().getY()+(childradius+Util.EPSILON)*Math.sin(direction);
+		double childVelocity = (1.5)*(getVelocity().getTotalVelocity(getVelocity().getXVelocity(),getVelocity().getYVelocity()));
 		double childXVelocity = childVelocity*Math.cos(direction);
 		double childYVelocity = childVelocity*Math.sin(direction);
 		SpaceObject Child1 = new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius);
 		
 		// Create Child 2
 		
-		double xPosChild2 = this.getX()-(childradius)*Math.cos(direction);
-		double yPosChild2 = this.getY()-(childradius)*Math.sin(direction);
+		double xPosChild2 = this.getPosition().getX()-(childradius)*Math.cos(direction);
+		double yPosChild2 = this.getPosition().getY()-(childradius)*Math.sin(direction);
 		SpaceObject Child2 = new Asteroid(xPosChild2, yPosChild2, childXVelocity*(-1), childYVelocity*(-1), childradius);
 			
 		world.removeObject(this);
@@ -173,7 +173,7 @@ public class Asteroid extends SpaceObject {
 	}
 	
 	/**
-	 * Sets a random object as the random object of the ship.
+	 * Sets a random object as the random object of the asteroid.
 	 * @param random
 	 * 			A random object.
 	 */

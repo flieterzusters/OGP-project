@@ -1,7 +1,7 @@
 package asteroids.model;
 
 
-import asteroids.Util;
+import asteroids.Util.*;
 
 import be.kuleuven.cs.som.annotate.*;
 
@@ -61,9 +61,9 @@ public class Ship extends SpaceObject {
 	 */
 	
 	public Ship(double x, double y, double xVelocity,
-			double yVelocity, double radius, double angle, double mass) {
+			double yVelocity, double radius, World world, double minimumRadius, double angle, double mass) {
 		
-		super( x, y, xVelocity, yVelocity, radius);							
+		super( x, y, xVelocity, yVelocity, radius, world, minimumRadius);							
 		setAngle(angle);
 		setMass(mass);
 		setAcceleration(mass);
@@ -96,6 +96,26 @@ public class Ship extends SpaceObject {
 	 */
 	private double acceleration;
 	
+	/**
+	 * Moves the ship for a duration dt according to its current state.
+	 * The ship will be moved according to its current position and its current velocity during the specified duration <code>dt</code>.
+	 * The specified duration <code>dt</code> can never be less than zero.
+	 * @param dt Specifies the duration of the move command.
+	 * @post The new xPos (yPos) is equal to the old xPos (yPos) changed by the xVelocity (yVelocity) multiplied by the given duration. 
+	 * 		| new Position.getX() = Position.getX() + Velocity.getXVelocity*dt 
+	 * 		| new Position.getY() = Position.getY() + Velocity.getYVelocity*dt	 
+	 */
+	@Override
+	public void move(double dt){	
+		
+		if (dt>0){
+			
+		double xpos = (getPosition().getX() + getVelocity().getXVelocity()*dt);
+		double ypos = (getPosition().getY() + getVelocity().getYVelocity()*dt);
+		Position.setPosition(new Position(xpos,ypos));
+		thrust(dt);
+		}
+	}
 	
 	
 	/**
@@ -135,27 +155,22 @@ public class Ship extends SpaceObject {
 	 * 
 	 * @post If the acceleration of the ship is equal to or less than zero, no change to the ship's velocity is made.
 	 * 	     | if(getAcceleration =< 0) then 
-	 *       |       new getXVelocity = getXVelocity
-	 *       |	     new getYVelocity = getYVelocity
+	 *       |       new getVelocity().getXVelocity = getVelocity().getXVelocity
+	 *       |	     new getVelocity().getYVelocity = getVelocity().getYVelocity
 	 * @post The new velocity vector is equal to the old velocity vector changed by the acceleration in the ship's current direction.
-	 *       | new getXVelocity = getXVelocity + getAcceleration*cos(angle)
-	 *       | new getYVelocity = getYVelocity + getAcceleration*sin(angle)
-	 * @effect If the new total velocity would exceed the ship's upper speed limit, 
-	 * 		   the new total velocity is changed to be equal to the speed of light without changing the direction of the velocity.
+	 *       | new getVelocity().getXVelocity = getVelocity().getXVelocity + getAcceleration*cos(angle)
+	 *       | new getVelocity().getYVelocity = getVelocity().getYVelocity + getAcceleration*sin(angle)
 	 * 		 
 	 */
 	public void thrust(double dt) {
 		
 		if (thrusterActive) {
 		
-		xVelocity = (this.getXVelocity() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
-		yVelocity = (this.getYVelocity() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
+		double xVelocity = (this.getVelocity().getXVelocity() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
+		double yVelocity = (this.getVelocity().getYVelocity() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
+		getVelocity().setVelocity(xVelocity, yVelocity);
 		}
 		
-		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), speedLimit)) {
-			
-			this.makeVelocityValid(xVelocity, yVelocity);			
-		}
 	}
 	
 	
@@ -256,8 +271,8 @@ public class Ship extends SpaceObject {
 		
 		double bulletRadius = 3;
 		double bulletSpeed = 250;
-		double bulletXPos = this.getX() + Math.cos(this.getDirection())*(this.getRadius()+ bulletRadius);
-		double bulletYPos = this.getY() + Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
+		double bulletXPos = this.getPosition().getX() + Math.cos(this.getDirection())*(this.getRadius()+ bulletRadius);
+		double bulletYPos = this.getPosition().getY() + Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
 		double bulletXVelocity = Math.cos(this.getDirection())* bulletSpeed;
 		double bulletYVelocity = Math.sin(this.getDirection())* bulletSpeed;
 		Bullet bullet = new Bullet(bulletXPos, bulletYPos, bulletXVelocity, bulletYVelocity, this);

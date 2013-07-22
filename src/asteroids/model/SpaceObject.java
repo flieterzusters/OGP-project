@@ -11,15 +11,8 @@ import asteroids.Util;
 /**
  * A class of space objects: ships, asteroids and bullets.
  * 
- * @invar The coordinates of each space object must be valid.
- * 		  | isValidCoordinate(getX()) && isValidCoordinate(getY())
- * 
  * @invar The radius of each space object must be valid.
  * 		  | isValidRadius(getRadius())
- * 
- * @invar The velocity of each space ship must be valid.
- * 		  | isValidVelocity()
- * 
  * 
  * @author Tom
  * @version 0.1
@@ -56,89 +49,44 @@ public abstract class SpaceObject {
 	 *
 	 */
 	public SpaceObject(double x, double y, double xVelocity,
-			double yVelocity, double radius) throws IllegalArgumentException {
+			double yVelocity, double radius, World world, double minimumRadius) throws IllegalArgumentException {
 		
-		setXPos(x);
-		setYPos(y);
-		setXVelocity(xVelocity);				 
-		setYVelocity(yVelocity);	
-		this.speedLimit = 300000;							
-		if (!isValidVelocity()) this.makeVelocityValid(xVelocity, yVelocity);
+		this.Position = new Position(x,y);
+		this.Velocity = new Velocity(xVelocity, yVelocity);							
 		if (isValidRadius(radius)) this.radius = radius; 
 		else {
 				throw new IllegalArgumentException ("The provided radius is either not a number or is too small.");
+		setWorld(world);
+		setMinimumRadius(minimumRadius);
+		
 		}
 		}
 	
 	/**
-	 * @return The space object's current x-coordinate in km.
+	 * @return The space object's current position in space.
 	 */
 	@Basic
-	public double getX() {
+	public Position getPosition() {
 		
-		return xPos;
+		return this.Position;
 	}
 	
 	/**
-	 * @return The space object's current y-coordinate in km.
+	 * Sets a new position in space for this space object.
+	 * @param newPos
+	 * 		  The new position for this space object.
 	 */
-	@Basic
-	public double getY() {
+	public void setPosition(Position newPos) {
+		this.Position = newPos;
 		
-		return yPos;
-	}
-	
-	
-	
-	
-		
-	/**
-	 * Sets a new x-coordinate for this space object.
-	 * @param newXPos
-	 * 		  The new x-coordinate for this space object.
-	 * @throws IllegalArgumentException
-	 * 		   When the new x-coordinate isn't valid.
-	 * 		   | (! isValidCoordinate(newXPos))
-	 */
-	public void setXPos(double newXPos) throws IllegalArgumentException {
-		if(!isValidCoordinate(newXPos)) throw new IllegalArgumentException();
-		else xPos = newXPos;	
-	}
-		
-	/**
-	 * Sets a new y-coordinate for this space object.
-	 * @param newYPos
-	 * 		  The new y-coordinate for this space object.
-	 * @throws IllegalArgumentException
-	 * 		   When the new y-coordinate isn't valid.
-	 * 		   | (! isValidCoordinate(newYPos))
-	 */
-	public void setYPos(double newYPos) throws IllegalArgumentException {
-		if(!isValidCoordinate(newYPos)) throw new IllegalArgumentException();
-		else yPos = newYPos;
-	}
-			
-	/**
-	 * Checks whether the coordinate is a valid coordinate.
-	 * @param coordinate
-	 * @return True if the coordinate is a number, false if the coordinate isn't.
-	 */
-	private boolean isValidCoordinate(double coordinate) {
-			
-		if(Double.isNaN(coordinate)) return false;
-		else return true;
-			
 	}
 	
 	/**
-	 * The space object's current position along the x-axis.
+	 * The current position of the space object.
 	 */
-	protected double xPos;
+	protected Position Position;
 	
-	/**
-	 * The space object's current position along the y-axis.
-	 */
-	protected double yPos;
+	
 	
 	/**
 	 * Moves the space object for a duration dt according to its current state.
@@ -147,15 +95,17 @@ public abstract class SpaceObject {
 	 * If the space object is a ship, the ship will thrust.
 	 * @param dt Specifies the duration of the move command.
 	 * @post The new xPos (yPos) is equal to the old xPos (yPos) changed by the xVelocity (yVelocity) multiplied by the given duration. 
-	 * 		| new this.getX() = this.getX() + getXVelocity*dt 
-	 * 		| new this.getY() = this.getY() + getYVelocity*dt	 
+	 * 		| new Position.getX() = Position.getX() + Velocity.getXVelocity*dt 
+	 * 		| new Position.getY() = Position.getY() + Velocity.getYVelocity*dt	 
 	 */
 	
 	public void move(double dt){	
 		
 		if (dt>0){
-		setXPos(getX() + this.getXVelocity()*dt);
-		setYPos(getY() + this.getYVelocity()*dt);
+			
+		double xpos = (getPosition().getX() + getVelocity().getXVelocity()*dt);
+		double ypos = (getPosition().getY() + getVelocity().getYVelocity()*dt);
+		Position.setPosition(new Position(xpos,ypos));
 		
 		if (this instanceof Ship) {
 			Ship ship = (Ship) this;
@@ -168,102 +118,32 @@ public abstract class SpaceObject {
 	
 	
 	/**
-	 * @return The space object's current velocity in the x-direction(km/s).
+	 * @return The space object's current velocity in space(km/s).
 	 */
 	@Basic
-	public double getXVelocity() {
+	public Velocity getVelocity() {
 		
-		return xVelocity;
-	}
-	/**
-	 * @return The space object's current velocity in the y-direction(km/s).
-	 */
-	@Basic
-	public double getYVelocity() {
-		
-		return yVelocity;
+		return this.Velocity;
 	}
 	
-	/**
-	 * @return The space object's total velocity (in km/s).
-	 */
-	public double getVelocity() {
-		
-		return Math.sqrt(Math.pow(getXVelocity(),2)+Math.pow(getYVelocity(),2));
-	}
+	
 	
 	/**
-	 * @return The space object's maximum speed.
-	 */
-	@Basic
-	public double getSpeedLimit() {
-		
-		return speedLimit;
-		
-	}
-	
-	/**
-	 * Sets the given xVelocity as the new xVelocity of the space object.
-	 * @param xVelocity
-	 * 		  The new xVelocity of the ship.
+	 * Sets the given velocity as the new Velocity of the space object.
+	 * @param newVelocity
+	 * 		  The new velocity of the ship.
 	 */
 	@Raw
-	public void setXVelocity(double xVelocity) {
-		this.xVelocity = xVelocity;
+	public void setVelocity(Velocity newVelocity) {
+		this.Velocity = newVelocity;
 	}
 	
-	/**
-	 * Sets the given yVelocity as the new yVelocity of the space object.
-	 * @param yVelocity
-	 * 		  The new yVelocity of the ship.
-	 */
-	@Raw
-	public void setYVelocity(double yVelocity) {
-		this.yVelocity = yVelocity;
-	}
+	
 	
 	/**
-	 * Checks whether the velocity of the space object is valid.
-	 * @return True if the velocity does not exceed the speedlimit, false if it does.
+	 * The space object's current velocity in space.
 	 */
-	public boolean isValidVelocity()
-	{
-		return (Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.getSpeedLimit()));
-	}
-	
-	/**
-	 * This method reduces a space object's velocity to make it comply with it's speed limit without changing the direction of movement.
-	 * @param xVelocity The x-velocity the space object currently possesses.
-	 * @param yVelocity The y-velocity the space object currently possesses.
-	 * @post The new getXVelocity (getYVelocity) satisfies the upper speed limit of the space object and the direction of movement is the same as before.
-	 * 		 | new getVelocity() <= this.speedLimit
-	 * 		 | new atan2(getYVelocity(),getXVelocity()) = atan2(getYvelocity(), getXVelocity)	
-	 */
-	@Raw @Model
-	public void makeVelocityValid(double Xvelocity, double Yvelocity) {
-		
-		double angleOfMovement = Math.atan2(Xvelocity, Yvelocity);
-		double xvelocity = speedLimit*Math.cos(angleOfMovement);
-		double yvelocity = speedLimit*Math.sin(angleOfMovement);
-		setXVelocity(xvelocity);
-		setYVelocity(yvelocity);
-		
-	}
-	
-	/**
-	 * The space object's current velocity in the x-direction.
-	 */
-	protected double xVelocity;
-	
-	/**
-	 * The space object's current velocity in the x-direction.
-	 */
-	protected double yVelocity; 
-	
-	/**
-	 * The space object's maximum speed, cannot exceed the speed of light.
-	 */
-	protected double speedLimit;
+	protected Velocity Velocity;
 	
 	/**
 	 * @return The world containing this object, null if this space object has no world.
@@ -280,7 +160,10 @@ public abstract class SpaceObject {
 	 */
 	@Basic @Raw
 	public void setWorld(World world) {
+		assert (world == null || world.containsSpaceObject(this));
+		assert (!getWorld().containsSpaceObject(this) || getWorld() == null || world != null);
 		this.world = world;
+		
 	}
 	
 	/**
@@ -294,7 +177,7 @@ public abstract class SpaceObject {
 	/**
 	 * The world in which this object is placed. Null if this object doesn't have a world.
 	 */
-	private World world = null;
+	private World world;
 	
 	/**
 	 * @return The space object's radius (in km).
@@ -324,9 +207,25 @@ public abstract class SpaceObject {
 	}
 	
 	/**
+	 * Sets a certain minimumradius for this spaceship.
+	 */
+	public void setMinimumRadius(double minimumradius){
+		this.minimumRadius = minimumradius;}
+	
+	/**
+	 * @param 	minimumRadius
+	 * 			The given minimum radius for this SpaceObject.
+	 * @return	True if the given minimum radius is positive or zero.
+	 * 
+	 */
+	public static boolean isValidMinimumRadius(double minimumRadius){
+		return !Double.isNaN(minimumRadius) && minimumRadius > 0;
+	}
+	
+	/**
 	 * The minimum radius a space object must have.
 	 */
-	protected double minimumRadius = 0;
+	protected final double minimumRadius;
 	
 	/**
 	 * The space object's radius (in km).
@@ -356,7 +255,7 @@ public abstract class SpaceObject {
 	 */
 	public double getDistanceBetween(SpaceObject secondObject) {
 		
-		double centerDistanceSquared = Math.pow(secondObject.getX()-this.getX() , 2) + Math.pow(secondObject.getY()-this.getY(), 2);
+		double centerDistanceSquared = Math.pow(secondObject.getPosition().getX()-this.getPosition().getX() , 2) + Math.pow(secondObject.getPosition().getY()-this.getPosition().getY(), 2);
 		return Math.sqrt(centerDistanceSquared);
 		
 	}
@@ -415,11 +314,11 @@ public abstract class SpaceObject {
 		
 		else {
 			double sigmaSquared = Math.pow(getSumOfRadii(secondObject), 2);
-			double deltaVSquared = Math.pow(secondObject.getXVelocity() - this.getXVelocity(), 2) 
-								 + Math.pow(secondObject.getYVelocity() - this.getYVelocity(), 2);	
-			double deltaRSquared = Math.pow(secondObject.getX() - this.getX(), 2) + Math.pow(secondObject.getY() - this.getY(), 2);
-			double deltaVDeltaR = (secondObject.getXVelocity() - this.getXVelocity())*(secondObject.getX() - this.getX()) 
-								+ (secondObject.getYVelocity() - this.getYVelocity())*(secondObject.getY() - this.getY());
+			double deltaVSquared = Math.pow(secondObject.getVelocity().getXVelocity() - this.getVelocity().getXVelocity(), 2) 
+								 + Math.pow(secondObject.getVelocity().getYVelocity() - this.getVelocity().getYVelocity(), 2);	
+			double deltaRSquared = Math.pow(secondObject.getPosition().getX() - this.getPosition().getX(), 2) + Math.pow(secondObject.getPosition().getY() - this.getPosition().getY(), 2);
+			double deltaVDeltaR = (secondObject.getVelocity().getXVelocity() - this.getVelocity().getXVelocity())*(secondObject.getPosition().getX() - this.getPosition().getX()) 
+								+ (secondObject.getVelocity().getYVelocity() - this.getVelocity().getYVelocity())*(secondObject.getPosition().getY() - this.getPosition().getY());
 			double d  = Math.pow(deltaVDeltaR, 2) - deltaVSquared*(deltaRSquared - sigmaSquared);
 			double deltaT;
 			if(Util.fuzzyEquals(deltaVDeltaR, 0) || deltaVDeltaR > 0 ) deltaT = Double.POSITIVE_INFINITY;
@@ -459,13 +358,13 @@ public abstract class SpaceObject {
 		if(deltaT == Double.POSITIVE_INFINITY) return null;
 			
 		double[] collisionPos = new double[2];
-		double theta = Math.atan2(secondObject.getY()-this.getY(), secondObject.getX()-this.getX());
-		if ((secondObject.getX()-this.getX())<0) {
+		double theta = Math.atan2(secondObject.getPosition().getY()-this.getPosition().getY(), secondObject.getPosition().getX()-this.getPosition().getX());
+		if ((secondObject.getPosition().getX()-this.getPosition().getX())<0) {
 			theta+=Math.PI*2;
 		}
 		
-		collisionPos[0] = this.getX() + this.radius * Math.cos(theta);
-		collisionPos [1] = this.getY() + this.radius * Math.sin(theta);
+		collisionPos[0] = this.getPosition().getX() + this.radius * Math.cos(theta);
+		collisionPos [1] = this.getPosition().getY() + this.radius * Math.sin(theta);
 		return collisionPos;
 	}
 		
@@ -505,21 +404,21 @@ public abstract class SpaceObject {
 		assert(!secondObject.equals(this));
 		
 		double sigma = getSumOfRadii(secondObject);
-		double deltaRx = secondObject.getX()-this.getX();
-		double deltaRy = secondObject.getY()-this.getY();
-		double deltaVx = secondObject.getXVelocity()- this.getXVelocity();
-		double deltaVy = secondObject.getYVelocity()-this.getYVelocity();
+		double deltaRx = secondObject.getPosition().getX()-this.getPosition().getX();
+		double deltaRy = secondObject.getPosition().getY()-this.getPosition().getY();
+		double deltaVx = secondObject.getVelocity().getXVelocity()- this.getVelocity().getXVelocity();
+		double deltaVy = secondObject.getVelocity().getYVelocity()-this.getVelocity().getYVelocity();
 		double deltaVR = (deltaVx*deltaRx)+(deltaVy*deltaRy);
 	
 		double J = (2*this.getMass()*secondObject.getMass()*deltaVR)/(sigma*(this.getMass()+secondObject.getMass()));
 		double Jx = (J*deltaRx)/(sigma);
 		double Jy = (J*deltaRy)/(sigma);
-		setXVelocity(this.getXVelocity()+(Jx/this.getMass()));
-		setYVelocity(this.getYVelocity()+(Jy/this.getMass()));
-		secondObject.setXVelocity(secondObject.getXVelocity()-(Jx/secondObject.getMass()));
-		secondObject.setYVelocity(secondObject.getYVelocity()-(Jy/secondObject.getMass()));
-		if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity(), this.getSpeedLimit() )) this.makeVelocityValid(xVelocity, yVelocity);
-		if (!Util.fuzzyLessThanOrEqualTo(secondObject.getVelocity(), secondObject.getSpeedLimit() )) secondObject.makeVelocityValid(xVelocity, yVelocity);
+		double newxvelocity = this.getVelocity().getXVelocity()+(Jx/this.getMass());
+		double newyvelocity = this.getVelocity().getYVelocity()+(Jy/this.getMass());
+		getVelocity().setVelocity(newxvelocity,newyvelocity);
+		double newxvelocity2 = secondObject.getVelocity().getXVelocity()-(Jx/secondObject.getMass());
+		double newyvelocity2 = secondObject.getVelocity().getYVelocity()-(Jy/secondObject.getMass());
+		secondObject.getVelocity().setVelocity(newxvelocity2,newyvelocity2);
 			
 	}
 		
@@ -583,26 +482,26 @@ public abstract class SpaceObject {
 		double timeToBoundaryX;
 		double timeToBoundaryY;
 
-		if(Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0)) {
+		if(Util.fuzzyLessThanOrEqualTo(this.getVelocity().getYVelocity(),0)) {
 			
-			timeToBoundaryY = Math.abs((getY()- getRadius())/(getYVelocity()));}
+			timeToBoundaryY = Math.abs((getPosition().getY()- getRadius())/(getVelocity().getYVelocity()));}
 		
-		else if (!Util.fuzzyLessThanOrEqualTo(this.getYVelocity(),0)) {
+		else if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity().getYVelocity(),0)) {
 			
-			timeToBoundaryY = Math.abs((worldheight - getY() - getRadius())/(getYVelocity()));
+			timeToBoundaryY = Math.abs((worldheight - getPosition().getY() - getRadius())/(getVelocity().getYVelocity()));
 		}
 		
 		else {
 			timeToBoundaryY = Double.POSITIVE_INFINITY;
 		}
 		
-		if(Util.fuzzyLessThanOrEqualTo(this.getXVelocity(),0)) {
+		if(Util.fuzzyLessThanOrEqualTo(this.getVelocity().getXVelocity(),0)) {
 			
-			timeToBoundaryX = Math.abs((getX()- getRadius())/(getXVelocity()));}
+			timeToBoundaryX = Math.abs((getPosition().getX()- getRadius())/(getVelocity().getXVelocity()));}
 		
-		else if (!Util.fuzzyLessThanOrEqualTo(this.getXVelocity(),0)) {
+		else if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity().getXVelocity(),0)) {
 			
-			timeToBoundaryX = Math.abs((worldwidth - getX() - getRadius())/(getXVelocity()));
+			timeToBoundaryX = Math.abs((worldwidth - getPosition().getX() - getRadius())/(getVelocity().getXVelocity()));
 		}
 		
 		else {
@@ -636,15 +535,15 @@ public abstract class SpaceObject {
 	{
 		if(getWorld()==null) throw new NullPointerException();
 		
-		if(Util.fuzzyEquals(getX(),getRadius()) || 
-				Util.fuzzyEquals((getX() + getRadius()), getWorld().getWorldWidth())) {
+		if(Util.fuzzyEquals(getPosition().getX(),getRadius()) || 
+				Util.fuzzyEquals((getPosition().getX() + getRadius()), getWorld().getWorldWidth())) {
 			
-			setXVelocity(-(this.getXVelocity()));}
+			getVelocity().setVelocity(-(this.getVelocity().getXVelocity()),this.getVelocity().getYVelocity());
+		}
 		
 		else {
-			setYVelocity(-(this.getYVelocity()));}
+			getVelocity().setVelocity(this.getVelocity().getXVelocity(),-(this.getVelocity().getYVelocity()));}
 		
-		makeVelocityValid(getXVelocity(),getYVelocity());
 		
 	}
 	

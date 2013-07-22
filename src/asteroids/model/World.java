@@ -147,6 +147,15 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether this world contains a certain space object.
+	 */
+	
+	public boolean containsSpaceObject(SpaceObject spaceobject)
+	{
+		return Objects.contains(spaceobject);
+	}
+	
+	/**
 	 * Adds a space object to this world.
 	 * 
 	 * @param ship 		The space object that is added to this world.

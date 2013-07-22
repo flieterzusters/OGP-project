@@ -13,7 +13,7 @@ import asteroids.ModelException;
  * @version: 0.1
  */
 
-public class Facade implements IFacade<World, Ship, Asteroid, Bullet> {
+public class Facade implements IFacade<World, Ship, Asteroid, Bullet, Program> {
 
 	@Override
 	public World createWorld(double width, double height) {
