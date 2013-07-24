@@ -51,7 +51,7 @@ public class Bullet extends SpaceObject {
 	public Bullet(double x, double y, double xVelocity,
 			double yVelocity, double radius, World world, Ship source) {
 		
-		super(x, y, xVelocity, yVelocity, radius, world, minimumRadius);
+		super(x, y, xVelocity, yVelocity, radius);
 		if(isValidSource(source)){
 			this.source = source;}
 		}

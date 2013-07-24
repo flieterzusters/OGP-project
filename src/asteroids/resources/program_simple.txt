@@ -1,0 +1,39 @@
+double x;
+double y;
+double z;
+
+x := (0.5 + 0.5);
+
+skip;
+turn(x);
+
+z := 1 + 1 + 1;
+print z;
+
+if (true) then
+ { fire; }
+if (true) then
+ { fire; }
+ else
+ { skip; }
+if (false) then
+ { }
+ else
+ { fire; }
+
+thrust;
+skip;
+thrust_off;
+fire;
+skip;
+
+y := getradius(self);
+
+while (true && (true || false)) do {
+  turn(0.5);
+  fire;
+}
+
+skip;
+fire;
+

@@ -1,12 +1,7 @@
 package asteroids.model;
-
-
-
-import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Immutable;
-import be.kuleuven.cs.som.annotate.Model;
-import be.kuleuven.cs.som.annotate.Raw;
 import asteroids.Util;
+import be.kuleuven.cs.som.annotate.*;
+
 
 /**
  * A class of space objects: ships, asteroids and bullets.
@@ -49,17 +44,15 @@ public abstract class SpaceObject {
 	 *
 	 */
 	public SpaceObject(double x, double y, double xVelocity,
-			double yVelocity, double radius, World world, double minimumRadius) throws IllegalArgumentException {
+			double yVelocity, double radius) throws IllegalArgumentException {
 		
 		this.Position = new Position(x,y);
 		this.Velocity = new Velocity(xVelocity, yVelocity);							
 		if (isValidRadius(radius)) this.radius = radius; 
 		else {
 				throw new IllegalArgumentException ("The provided radius is either not a number or is too small.");
-		setWorld(world);
-		setMinimumRadius(minimumRadius);
 		
-		}
+			 }
 		}
 	
 	/**
@@ -154,30 +147,81 @@ public abstract class SpaceObject {
 	}
 	
 	/**
-	 * Puts this object in a particular world.
+	 * Puts this object in a particular world if this world is suitable.
 	 * @param world 
 	 * 		  The world in which this object will be placed.
 	 */
 	@Basic @Raw
 	public void setWorld(World world) {
-		assert (world == null || world.containsSpaceObject(this));
-		assert (!getWorld().containsSpaceObject(this) || getWorld() == null || world != null);
-		this.world = world;
+		if (this.canHaveAsWorld(world))
+		{this.world = world;}
 		
 	}
 	
 	/**
+	 * Checks whether this space object has a world.
+	 */
+	public boolean hasWorld()
+	{
+		return (this.getWorld() != null);
+	}
+	
+	/**
+	 * Check whether this space object can have the given world as its world.
+	 * 
+	 * @param  world
+	 *         The world to check.
+	 * @return  If this space object is not yet terminated, return true if the given world is not null and not yet
+	 *          terminated.
+	 *        | if (! isTerminated())
+	 *        |   then result == (world != null) && (! world.isTerminated())
+	 * @return  If this space object is terminated, return true if the given world is null.
+	 *        | if (! this.isTerminated())
+	 *        |   then result == (world == null)
+	 */
+	@Raw
+	public boolean canHaveAsWorld(World world){
+		if (this.isTerminated()) {return (world == null);}
+		return (world != null) && (!world.isTerminated());
+	}
+	
+	/**
 	 * Removes this object from his world.
+	 * @post This object has no world anymore.
+	 * @post His former world doesn't have this particular space object anymore.
 	 */
 	@Basic @Raw
 	public void removeWorld () {
-		this.world = null;
+		if(this.hasWorld())
+		{
+			World world = this.getWorld();
+			world.removeObject(this);
+			this.setWorld(null);
+			
+		}
+	}
+	
+	/**
+	 * @param world
+	 * 		  The world we check to see either this spaceobject fits in it or not.
+	 */
+	public boolean fitsInWorld (World world) {
+		if (world == null) {return false;}
+		double xpos = getPosition().getX();
+		double ypos = getPosition().getY();
+		double radius = getRadius();
+		
+		if (xpos-radius < 0 || xpos+radius > world.getWorldWidth() || ypos-radius < 0 || ypos+radius > world.getWorldHeight())
+		{
+			return false;
+		}
+		else {return true;}
 	}
 	
 	/**
 	 * The world in which this object is placed. Null if this object doesn't have a world.
 	 */
-	private World world;
+	protected World world;
 	
 	/**
 	 * @return The space object's radius (in km).
@@ -202,30 +246,10 @@ public abstract class SpaceObject {
 	 * @return True if the radius is a number and greater than the minimumRadius.
 	 */
 	private boolean isValidRadius(double radius) {
-		if(Double.isNaN(radius) || !Util.fuzzyLessThanOrEqualTo(minimumRadius, radius)) return false;
-		else return true;
+		if(radius > 0 && radius < Double.POSITIVE_INFINITY) return true;
+		else return false;
 	}
 	
-	/**
-	 * Sets a certain minimumradius for this spaceship.
-	 */
-	public void setMinimumRadius(double minimumradius){
-		this.minimumRadius = minimumradius;}
-	
-	/**
-	 * @param 	minimumRadius
-	 * 			The given minimum radius for this SpaceObject.
-	 * @return	True if the given minimum radius is positive or zero.
-	 * 
-	 */
-	public static boolean isValidMinimumRadius(double minimumRadius){
-		return !Double.isNaN(minimumRadius) && minimumRadius > 0;
-	}
-	
-	/**
-	 * The minimum radius a space object must have.
-	 */
-	protected final double minimumRadius;
 	
 	/**
 	 * The space object's radius (in km).
@@ -242,6 +266,37 @@ public abstract class SpaceObject {
 	 * The current mass of the space object.
 	 */
 	protected double mass;
+	
+	/**
+	 * Enumeration of all possible states of a space object.
+	 */
+	protected static enum State{
+		ACTIVE,TERMINATED;
+	}
+	
+	/**
+	 * @return	Returns the state of the Space Object. The state is either Active or Terminated.
+	 */
+	@Raw @Basic
+	protected State getState()
+	{
+		return this.state;
+	}
+	
+	/**
+	 * Sets the state of the space object in a given state.
+	 */
+	@Basic
+	protected void setState(State state)
+	{
+		if(state == null) {throw new NullPointerException();}
+		this.state = state;
+	}
+	
+	/**
+	 *  the state of a space object.
+	 */
+	protected State state = State.ACTIVE;
 	
 	/**
 	 * Returns the distance between this space object and the given space object. This distance is the shortest distance the space objects would have to move
@@ -553,6 +608,26 @@ public abstract class SpaceObject {
 	 * 				The space object in collision with this space object.
 	 */
 	public abstract void resolve(SpaceObject collisionobject);
+	
+	/**
+	 * This method terminates a space object.
+	 * 
+	 */
+	public void terminate()
+	{
+		this.removeWorld();
+		this.setState(State.TERMINATED);
+	}
+	
+	/**
+	 * Check whether this Space Object is terminated.
+	 * 
+	 * @return True if  the state of this object is terminated.
+	 * 			
+	 */
+	public boolean isTerminated(){
+		return (this.getState() == State.TERMINATED);
+	}
 	
 }
 		

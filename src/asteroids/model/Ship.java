@@ -61,9 +61,9 @@ public class Ship extends SpaceObject {
 	 */
 	
 	public Ship(double x, double y, double xVelocity,
-			double yVelocity, double radius, World world, double minimumRadius, double angle, double mass) {
+			double yVelocity, double radius, double angle, double mass) {
 		
-		super( x, y, xVelocity, yVelocity, radius, world, minimumRadius);							
+		super( x, y, xVelocity, yVelocity, radius);							
 		setAngle(angle);
 		setMass(mass);
 		setAcceleration(mass);
@@ -275,7 +275,7 @@ public class Ship extends SpaceObject {
 		double bulletYPos = this.getPosition().getY() + Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
 		double bulletXVelocity = Math.cos(this.getDirection())* bulletSpeed;
 		double bulletYVelocity = Math.sin(this.getDirection())* bulletSpeed;
-		Bullet bullet = new Bullet(bulletXPos, bulletYPos, bulletXVelocity, bulletYVelocity, this);
+		Bullet bullet = new Bullet(bulletXPos, bulletYPos, bulletXVelocity, bulletYVelocity, bulletRadius, this.getWorld(), this);
 		this.getWorld().addObject(bullet);
 	}
 	
@@ -308,5 +308,28 @@ public class Ship extends SpaceObject {
 		
 	}
 	
+	/**
+	 * @return Returns the program with which this ship is associated.
+	 */
+	@Basic
+	public Program getProgram(){
+		return this.program;
+	}
+	
+	/**
+	 * Sets a certain program for this ship.
+	 * @param program
+	 * 		  The program this ship will be associated with.
+	 */
+	@Basic
+	public void setProgram(Program program) {
+		this.program = program;
+		program.setShip(this);
+	}
+	
+	/**
+	 * The program associated with this ship.
+	 */
+	private Program program = null;
 	
 }

@@ -1,6 +1,7 @@
 package asteroids.model;
 
 import asteroids.Util;
+
 import be.kuleuven.cs.som.annotate.Basic;
 import java.util.Random;
 import be.kuleuven.cs.som.annotate.Immutable;
@@ -44,40 +45,26 @@ public class Asteroid extends SpaceObject {
 	 * 
 	 */
 	
-	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius, World world, double minimumRadius, Random random)
+	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius, Random random)
 	{
-		super(x, y, xVelocity, yVelocity, radius, world, minimumRadius);
+		super(x, y, xVelocity, yVelocity, radius);
 		setRandom(random);
 	
-		
 	}
 	
 	/**
-	 * Creates a new Asteroid with user defined parameters.
-	 * @param x	
-	 * 		  The initial x-coordinate of the asteroid, expressed in km.
-	 * @param y	
-	 * 		  The initial y-coordinate of the asteroid, expressed in km.
-	 * @param xVelocity 
-	 * 		  The initial velocity in the x-direction the asteroid will have, expressed in km/s.
-	 * @param yVelocity 
-	 * 		  The initial velocity in the y-direction the asteroid will have, expressed in km/s.
-	 * @param radius 
-	 * 		  The asteroid's radius, expressed in km.
-	 * 
-	 * @effect This new asteroid is initialized as a SpaceObject with a given position, speed and radius.
-	 *        | super(x, y, xVelocity, yVelocity, radius)
-	 *        
-	 * 
-	 * 
+	 * Creates a new Asteroid with a given position, velocity and radius.
+	 * @param x
+	 * @param y
+	 * @param xVelocity
+	 * @param yVelocity
+	 * @param radius
+	 * @effect |this(x, y, xVelocity, yVelocity, radius, null)
 	 */
-	
-	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius) 
+	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius)
 	{
-		this(x, y, xVelocity, yVelocity, radius, new Random());
-		
+		this(x, y, xVelocity, yVelocity, radius, null);
 	}
-	
 	
 	
 	/**

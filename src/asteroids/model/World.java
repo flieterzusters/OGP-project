@@ -156,45 +156,20 @@ public class World {
 	}
 	
 	/**
-	 * Adds a space object to this world.
-	 * 
-	 * @param ship 		The space object that is added to this world.
-	 */
-	
-	public void addObject (SpaceObject object) throws IllegalObjectException {
-		
-		if(object == null) {throw new NullPointerException();}
-		
-		if(isValidSpaceObject(object))
-		{
-		object.setWorld(this);
-		Objects.add(object);
-		}
-		else {throw new IllegalObjectException ("This object can't be added to this world.");}
-	}
-	
-	/**
-	 * Removes a space object from this world.
-	 * 
-	 * @param object		The object that is removed from this world.
-	 */
-	public void removeObject (SpaceObject object) {
-		
-		if(object == null) {throw new NullPointerException();}
-		Objects.remove(object);
-	}
-	
-	/**
 	 * Checks whether the space object is valid, to be added to this game world.
-	 * @param object
-	 * 			The space object to be checked.
-	 * @return True if the space object is valid. This means it doens't overlap with any other space object in this world.
+	 * If valid, it adds the space object to this world.
+	 * 
+	 * @param object 		The space object to be checked and added to this world.
 	 */
 	
-	private boolean isValidSpaceObject(SpaceObject object) {
+	public void addObject (SpaceObject object) {
 		
+		if(object == null || !object.fitsInWorld(this)) {throw new IllegalArgumentException();}
+		
+		object.setWorld(this);
 		boolean validSpaceObject = true;
-		for(SpaceObject spaceobject : Objects)
+		
+		for(SpaceObject spaceobject : getObjects())
 		{
 			if(object instanceof Bullet)
 			{
@@ -210,9 +185,24 @@ public class World {
 			{
 				validSpaceObject=false;
 			}
+		if(validSpaceObject)
+		{
+			Objects.add(object);
 		}
 		
-		return validSpaceObject;
+		}
+	}
+	
+	/**
+	 * Removes a space object from this world.
+	 * 
+	 * @param object		The object that is removed from this world.
+	 */
+	public void removeObject (SpaceObject object) {
+		
+		if(object == null) {throw new NullPointerException();}
+		Objects.remove(object);
+		object.removeWorld();
 	}
 	
 	
@@ -220,6 +210,17 @@ public class World {
 	 * A collection of all the space objects in the world.
 	 */
 	private Set<SpaceObject> Objects;
+	
+	/**
+	 * A simple method to move all the spaceobjects in this world during a given time dt.
+	 * @param dt
+	 * 		  The time the objects are moved.	  
+	 */
+	public void moveAllSpaceObjects(double dt)
+	{
+		for (SpaceObject object : getObjects())
+		{object.move(dt);}
+	}
 	
 	/**
 	 * Evolves the world for an amount of time dt.
@@ -309,21 +310,12 @@ public class World {
 				}
 			}
 				
-			if(timeToFirstCollision > dt)
+			if(timeToFirstCollision > dt || timeToFirstCollision == Double.POSITIVE_INFINITY)
 				break;
 			
-				
-				
-			for(SpaceObject spaceobject : Objects)
-			{
-				spaceobject.move(timeToFirstCollision);
-			}
-				
-			if(timeToFirstCollision == Double.POSITIVE_INFINITY)
-				break;
+			moveAllSpaceObjects(timeToFirstCollision);
 	
-			
-			else if (collisionObject2 == null)
+			if (collisionObject2 == null)
 			{
 				collisionObject1.resolveBoundaryCollision();
 			}
@@ -336,11 +328,7 @@ public class World {
 			dt = dt - timeToFirstCollision;
 		}
 			
-		for(SpaceObject spaceobject : Objects)
-		{
-			spaceobject.move(timeToFirstCollision);
-		}
-		
+		moveAllSpaceObjects(timeToFirstCollision);
 		
 	}
 	
@@ -357,6 +345,36 @@ public class World {
 	 	else {return true;}
 	}
 	
+	/**
+	 * @return The boolean field 'isTerminated()'.
+	 */
+	public boolean isTerminated() {
+		return isTerminated;
+	}
+
+	/**
+	 * Terminates a world.
+	 * 
+	 * @post    This world is terminated.
+	 *        | new.isTerminated()
+	 * @post    Each of the space objects of this world no longer has
+	 *          a world.
+	 *        | for each space object in getObjects():
+	 *        |	  (! (new space object).hasSpaceObject())
+	 */
+	public void terminate(){
+		if (!isTerminated()) {
+			for (SpaceObject spaceObject : this.getObjects())
+				spaceObject.removeWorld();
+			this.isTerminated = true;
+		}
+	}
+	
+	/**
+	 * Indicates whether the world is terminated or not.
+	 */
+	private boolean isTerminated;
+
 	
 }
 	

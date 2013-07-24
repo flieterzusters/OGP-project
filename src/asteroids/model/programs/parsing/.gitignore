@@ -1,0 +1,8 @@
+AsteroidsParserParser*.java
+AsteroidsParserLexer*.java
+AsteroidsParserListener.java
+AsteroidsParserBaseListener.java
+AsteroidsParser*.tokens
+antlr
+antlr-4.0-complete.jar
+antlrclasspath

@@ -1,11 +1,24 @@
 package asteroids.model;
 
-import java.util.Random;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+
+import org.antlr.v4.runtime.RecognitionException;
 
 import asteroids.CollisionListener;
 import asteroids.IFacade;
 import asteroids.ModelException;
+import asteroids.IFacade.ParseOutcome;
+import asteroids.IFacade.TypeCheckOutcome;
+import asteroids.model.programs.*;
+import asteroids.model.programs.parsing.*;
+
+import java.io.*;
+
+import java.lang.StringBuilder;
+
 
 
 /**
@@ -13,7 +26,7 @@ import asteroids.ModelException;
  * @version: 0.1
  */
 
-public class Facade implements IFacade<World, Ship, Asteroid, Bullet, Program> {
+public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.model.Program> {
 
 	@Override
 	public World createWorld(double width, double height) {
@@ -127,26 +140,26 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, Program> {
 	@Override
 	public double getShipX(Ship ship) 
 	{
-		return ship.getX();
+		return ship.getPosition().getX();
 	}
 
 	@Override
 	public double getShipY(Ship ship) 
 	{
-		return ship.getY();
+		return ship.getPosition().getY();
 	}
 
 	@Override
 	public double getShipXVelocity(Ship ship) 
 	{
-		return ship.getXVelocity();
+		return ship.getVelocity().getXVelocity();
 	}
 	
 
 	@Override
 	public double getShipYVelocity(Ship ship) 
 	{
-		return ship.getYVelocity();
+		return ship.getVelocity().getYVelocity();
 	}
 	
 
@@ -231,25 +244,25 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, Program> {
 	 
 	public double getAsteroidX(Asteroid asteroid) 
 	{
-		return asteroid.getX();
+		return asteroid.getPosition().getX();
 	}
 
 	  
 	public double getAsteroidY(Asteroid asteroid) 
 	{
-		return asteroid.getY();
+		return asteroid.getPosition().getY();
 	}
 
 	  
 	public double getAsteroidXVelocity(Asteroid asteroid) 
 	{
-		return asteroid.getXVelocity();
+		return asteroid.getVelocity().getXVelocity();
 	}
 
 	 
 	public double getAsteroidYVelocity(Asteroid asteroid) 
 	{
-		return asteroid.getYVelocity();
+		return asteroid.getVelocity().getYVelocity();
 	}
 
 	 
@@ -280,22 +293,22 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, Program> {
 
 	public double getBulletX(Bullet bullet) 
 	{
-		return bullet.getX();
+		return bullet.getPosition().getX();
 	}
 
 	public double getBulletY(Bullet bullet) 
 	{
-		return bullet.getY();
+		return bullet.getPosition().getY();
 	}
 
 	public double getBulletXVelocity (Bullet bullet) 
 	{
-		return bullet.getXVelocity();
+		return bullet.getVelocity().getXVelocity();
 	}
 
 	public double getBulletYVelocity(Bullet bullet) 
 	{
-		return bullet.getYVelocity();
+		return bullet.getVelocity().getYVelocity();
 	}
 
 	public double getBulletRadius(Bullet bullet) 
@@ -316,6 +329,61 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, Program> {
 	public Ship getBulletSource(Bullet bullet) 
 	{
 		return bullet.getSource();
+	}
+
+	@Override
+	public asteroids.IFacade.ParseOutcome<Program> parseProgram(String text) {
+		 
+		ProgramFactoryImplementation factory = new ProgramFactoryImplementation();
+		    ProgramParser<Expression, Statement, Type> parser = new ProgramParser<>(factory);
+		    try {parser.parse(text);
+		        List<String> errors = parser.getErrors();
+		        if(! errors.isEmpty()) {
+		          return ParseOutcome.failure(errors.get(0));
+		        } else {
+		        	Statement statement = parser.getStatement();
+		        	Program program = new Program();
+		        	program.setGlobals(parser.getGlobals());
+		        	program.setStatement(statement);
+		        	factory.setProgram(program);
+		          return ParseOutcome.success(program); 
+		        }
+		    } catch(RecognitionException e) {
+		      return ParseOutcome.failure(e.getMessage());
+		    }
+	}
+	
+
+	@Override
+	public asteroids.IFacade.ParseOutcome<Program> loadProgramFromStream(
+			InputStream stream) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public asteroids.IFacade.ParseOutcome<Program> loadProgramFromUrl(URL url)
+			throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isTypeCheckingSupported() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public asteroids.IFacade.TypeCheckOutcome typeCheckProgram(Program program) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setShipProgram(Ship ship, Program program) {
+		ship.setProgram(program);
+		
 	}
 
 }
