@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 import org.hamcrest.core.Is;
 import org.junit.*;
 import asteroids.model.*;
-import asteroids.Util;
-import java.util.Set;
-import java.util.HashSet;
+
 
 
 public class WorldTest {
@@ -26,7 +24,7 @@ public class WorldTest {
 	public void setUp() throws Exception {
 		ship1 = new Ship(50, 50, 100, 200, 15, 0, 100);
 		asteroid1 = new Asteroid(300, 400, -45, -60, 20);
-		bullet1 = new Bullet(500, 700, 60, -20, bulletSource);
+		bullet1 = new Bullet(500, 700, 60, -20, 40, worldWithObj, bulletSource);
 		worldWithObj = new World(1000, 1000);
 		worldWithObj.addObject(ship1);
 		worldWithObj.addObject(bullet1);

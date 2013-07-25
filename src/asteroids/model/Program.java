@@ -1,4 +1,5 @@
 package asteroids.model;
+import asteroids.model.programs.Statement.*;
 
 import asteroids.model.programs.*;
 import java.util.*;

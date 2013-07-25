@@ -14,6 +14,8 @@ import asteroids.IFacade.ParseOutcome;
 import asteroids.IFacade.TypeCheckOutcome;
 import asteroids.model.programs.*;
 import asteroids.model.programs.parsing.*;
+import asteroids.model.programs.Expression.*;
+import asteroids.model.programs.Statement.*;
 
 import java.io.*;
 

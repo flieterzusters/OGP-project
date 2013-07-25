@@ -281,13 +281,6 @@ public class AsteroidsParserMyListener<E, S, T> implements AsteroidsParserListen
     return (factory.createDoubleLiteral(line, column, Double.parseDouble(n.getText())));
   }
   
-  private E ExpressionOfConditional(AsteroidsParserParser.ExprContext e1, AsteroidsParserParser.ExprContext e2, AsteroidsParserParser.ExprContext e3) {
-    if(e1 == null)
-      return null;
-    int line = e1.getStart().getLine();
-    int column = e1.getStart().getCharPositionInLine();
-    return factory.createConditionalExpression(line, column, ExpressionOfExpr(e1), ExpressionOfExpr(e2), ExpressionOfExpr(e3));
-  }
 
   private E ExpressionOfBinop(AsteroidsParserParser.BinopContext op, AsteroidsParserParser.ExprContext e1, AsteroidsParserParser.ExprContext e2) {
     if(op == null || e1 == null)
@@ -407,11 +400,7 @@ public class AsteroidsParserMyListener<E, S, T> implements AsteroidsParserListen
       }
       break;
     }
-    case 3:
-      if(expr.QUESTION() != null) {
-        return ExpressionOfConditional(e.get(0), e.get(1), e.get(2));
-      }
-      break;
+   
     default: {
     }
     }

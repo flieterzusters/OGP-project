@@ -10,7 +10,7 @@ import asteroids.Util;
 
 public class ShipTest {
 	
-	private static final double SPEEDOFLIGHT = 300000;
+	
 	private static Ship staticShip1;
 	private static Ship staticShip2;
 	private static Ship staticShip3;
@@ -42,11 +42,6 @@ public class ShipTest {
 		
 	}
 
-	@Test
-	public void constructor_IllegalSpeedTest() {
-		Ship newShip = new Ship(10, 10, 250000, 250000, 15, 0, 50);
-		assertTrue ("Speed has not been adjusted properly", Util.fuzzyLessThanOrEqualTo(newShip.getVelocity(), newShip.getSpeedLimit() ));
-	}
 	
 	
 	@Test
@@ -61,57 +56,20 @@ public class ShipTest {
 		}
 	}
 	
-	@Test 
-	public void getXTest() {		
-		assertEquals("Expected a value of 100 for staticShip1", 100 ,staticShip1.getX(),Util.EPSILON);
-		assertEquals("Expected a value of -100 for staticShip2", -100, staticShip2.getX(), Util.EPSILON);
-	}
 	
 	
-	@Test
-	public void getYTest() {
-		assertEquals("200 Expected for staticShip1", 200, staticShip1.getY(), Util.EPSILON);
-		assertEquals("-200 Expected for StaticShip2", -200, staticShip2.getY(), Util.EPSILON);
-	}
 	
-	@Test
-	public void moveTest_NormalCase() {
-		dynamicShip1.move(10.135);
-		assertTrue(Util.fuzzyEquals(dynamicShip1.getX(), 151.350 ));
-		assertTrue(Util.fuzzyEquals(dynamicShip1.getY(), 2050.675 ));
-	}
+
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void moveTest_IllegalCase() throws IllegalArgumentException {
 		dynamicShip1.move(Math.sqrt(-1));
 	}
 	
-	@Test
-	public void getXVelocityTest() {
-		assertEquals("expected a value of 10", 10, dynamicShip1.getXVelocity(), Util.EPSILON);
-	}
+
+
 	
-	@Test
-	public void getYVelocityTest() {
-		assertEquals("expected a value of 5", 5, dynamicShip1.getYVelocity(), Util.EPSILON);
-	}
-	
-	@Test
-	public void thrustTest_LegalCase() {
-		dynamicShip1.thrust(50) ;
-		assertEquals("A value of approx. 37.015115 is expected", 37.015115, dynamicShip1.getXVelocity(), Util.EPSILON)	;
-		assertEquals("A value of approx. 47.07355 is expected", 47.07355, dynamicShip1.getYVelocity(),Util.EPSILON);
-		
-	}
-	
-	@Test 
-	public void thrustTest_SpeedLimitExceeded() {
-		dynamicShip2.thrust(300000);
-		assertEquals("A value of approx. -296971.7542 is expected", -296971.7542, dynamicShip2.getXVelocity(), Util.EPSILON);
-		assertEquals("A value of approx. 42517.96 is expected", 42517.96350, dynamicShip2.getYVelocity(), Util.EPSILON);
-		assertTrue("The speed is not aprox. equal to the speedlimit", Util.fuzzyEquals(dynamicShip2.getVelocity(), dynamicShip2.getSpeedLimit()));
-	}
-	
+
 	@Test
 	public void getRadiusTest() {
 		assertEquals("A value of 25 was expected", 25, staticShip2.getRadius(), Util.EPSILON);

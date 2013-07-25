@@ -4,7 +4,6 @@ import asteroids.model.programs.Expression.*;
 import java.util.List;
 import asteroids.model.Ship;
 import asteroids.model.programs.*;
-import asteroids.model.programs.parsing.ProgramFactory.ForeachType;
 import asteroids.model.*;
 import asteroids.model.programs.Statement.*;
 import asteroids.model.programs.Statement.actionStatement.*;
@@ -212,7 +211,7 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	
 	@Override
 	public Statement createSequence(int line, int column, List<Statement> statements) {
-		
+		return null;
 	}
 	
 	@Override
