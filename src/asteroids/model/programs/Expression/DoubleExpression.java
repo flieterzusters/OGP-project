@@ -9,5 +9,10 @@ public abstract class DoubleExpression extends Expression{
 	}
 	
 	public abstract double getValue();
+	
+	@Override
+	public String toString() {
+		return Double.toString(getValue());
+	}
 
 }

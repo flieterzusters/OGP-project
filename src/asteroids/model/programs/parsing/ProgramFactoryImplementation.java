@@ -9,6 +9,9 @@ import asteroids.model.*;
 import asteroids.model.programs.Statement.*;
 import asteroids.model.programs.Statement.actionStatement.*;
 import asteroids.model.programs.Statement.standardStatement.*;
+import asteroids.model.programs.Expression.booleanExpression.*;
+import asteroids.model.programs.Expression.doubleExpression.*;
+import asteroids.model.programs.Expression.standardExpression.*;
 
 public class ProgramFactoryImplementation implements ProgramFactory<Expression, Statement, Type> {
 	
@@ -89,7 +92,7 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	
 	@Override
 	public Expression createVariable(int line, int column, String name) {
-		
+		return new Variable(line, column, name);
 	}
 	
 	@Override
@@ -189,12 +192,12 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	
 	@Override
 	public Statement createIf(int line, int column, Expression condition, Statement then, Statement otherwise) {
-		
+		return new If(line, column, condition, then, otherwise);
 	}
 	
 	@Override
 	public Statement createWhile(int line, int column, Expression condition, Statement body) {
-		
+		return new While(line, column, condition, body);
 	}
 	
 	@Override
@@ -214,12 +217,12 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	
 	@Override
 	public Statement createPrint(int line, int column, Expression e) {
-		
+		return new Print(line, column, e);
 	}
 	
 	@Override
 	public Statement createForLoop(int line, int column, Expression counter, Statement body) {
-		
+		return null;
 	}
 	
 	@Override

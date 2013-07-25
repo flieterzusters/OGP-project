@@ -33,11 +33,12 @@ public class Assignment extends StandardStatement {
 	@Override
 	public void execute() {
 		Type type = null;
-		if(rhs instanceof DoubleExpression) {
-			type = new DoubleT(((DoubleExpression) rhs).getValue());
-		}
-		else if(rhs instanceof BooleanExpression) {
+		if(rhs instanceof BooleanExpression) {
 			type = new BooleanT(((BooleanExpression) rhs).getValue());
+		}
+		
+		else if(rhs instanceof DoubleExpression) {
+			type = new DoubleT(((DoubleExpression) rhs).getValue());
 		}
 	
 		getProgram().setGlobal(this.string, type);

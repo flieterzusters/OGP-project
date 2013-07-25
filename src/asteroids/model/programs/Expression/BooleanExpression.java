@@ -10,4 +10,9 @@ public abstract class BooleanExpression extends Expression{
 
 	public abstract boolean getValue();
 	
+	@Override
+	public String toString() {
+		return Boolean.toString(getValue());
+	}
+	
 }

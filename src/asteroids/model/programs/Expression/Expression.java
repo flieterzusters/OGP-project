@@ -1,7 +1,7 @@
 package asteroids.model.programs.Expression;
 import asteroids.model.programs.*;
 
-public class Expression extends Code {
+public abstract class Expression extends Code {
 	
 
 		protected Expression(int line,int column, Type type) {
@@ -22,6 +22,10 @@ public class Expression extends Code {
 		}
 		
 		private Type type;
+		
+		public abstract String toString();
+		
+		
 		
 
 }
