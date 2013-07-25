@@ -1,11 +1,16 @@
-package asteroids.model.programs;
+package asteroids.model.programs.Expression;
+import asteroids.model.programs.*;
 
 public class Expression extends Code {
 	
 
-		public Expression(int line,int column, Type type) {
+		protected Expression(int line,int column, Type type) {
 			super(line,column);
 			setType(type);
+		}
+		
+		protected Expression(int line, int column) {
+			super(line, column);
 		}
 		
 		public Type getType() {

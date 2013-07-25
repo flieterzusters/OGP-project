@@ -1,12 +1,12 @@
-package asteroids.model.programs;
-
+package asteroids.model.programs.Expression;
+import asteroids.model.programs.*;
 import asteroids.model.*;
 
 public class EntityLiteral extends Expression {
 	
 	public EntityLiteral (int line, int column, SpaceObject value)
 	{
-		super(line, column, new Entity());
+		super(line, column, new EntityT());
 		setValue(value);
 	}
 	

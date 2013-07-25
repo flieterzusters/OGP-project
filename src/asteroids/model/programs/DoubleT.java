@@ -1,12 +1,12 @@
 package asteroids.model.programs;
 
-public class Double extends Type {
+public class DoubleT extends Type {
 	
-	public Double(){
+	public DoubleT(){
 		
 	}
 	
-	public Double(double value) {
+	public DoubleT(double value) {
 		setValue(value);
 	}
 	
@@ -15,13 +15,10 @@ public class Double extends Type {
 	}
 	
 	
-	public double evaluate() {
+	public double getValue() {
 		return value;
 	}
 	
-	private double value;
+	private double value = 0.0;
 
 }
-
-
-

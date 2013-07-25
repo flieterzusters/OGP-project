@@ -1,4 +1,4 @@
-package asteroids.model.programs;
+package asteroids.model.programs.Expression;
 
 public class GetX extends DoubleExpression {
 	

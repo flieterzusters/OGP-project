@@ -1,4 +1,5 @@
-package asteroids.model.programs;
+package asteroids.model.programs.Statement;
+import asteroids.model.programs.*;
 
 public abstract class Statement extends Code {
 	
@@ -6,6 +7,6 @@ public abstract class Statement extends Code {
 		super (line, column);
 	}
 	
-	public abstract void Execute();
+	public abstract void execute();
 
 }

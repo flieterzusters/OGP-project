@@ -25,6 +25,14 @@ public class Program {
 		this.globals = new HashMap<String,Type>(globals);
 	}
 	
+	public Type getGlobal (String name) {
+		return globals.get(name);
+	}
+	
+	public void setGlobal(String name, Type type) {
+		globals.put(name, type);
+	}
+	
 	private Map<String,Type> globals;
 	
 	public Statement getStatement() {
