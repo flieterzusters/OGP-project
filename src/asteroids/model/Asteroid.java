@@ -45,9 +45,9 @@ public class Asteroid extends SpaceObject {
 	 * 
 	 */
 	
-	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius, Random random)
+	public Asteroid(Vector position, Vector velocity, double radius, Random random)
 	{
-		super(x, y, xVelocity, yVelocity, radius);
+		super(position, velocity, radius);
 		setRandom(random);
 	
 	}
@@ -61,9 +61,9 @@ public class Asteroid extends SpaceObject {
 	 * @param radius
 	 * @effect |this(x, y, xVelocity, yVelocity, radius, null)
 	 */
-	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius)
+	public Asteroid(Vector position, Vector velocity, double radius)
 	{
-		this(x, y, xVelocity, yVelocity, radius, null);
+		this(position, velocity, radius, null);
 	}
 	
 	
@@ -109,13 +109,14 @@ public class Asteroid extends SpaceObject {
 	 * 		|		getWorld().addObject(new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius, getRandom()))
 	 * 		|		getWorld().addObject(new Asteroid(xPosChild2, yPosChild2, -childXVelocity, -childYVelocity, childradius, getRandom()))
 	 */
-	public void Die() {
+	@Override
+	public void terminate() {
 		
 		World world = getWorld();
 		
 		if(world == null || getRadius() < 30)
 		{
-			super.Die();
+			super.terminate();
 			return;
 		}
 		
@@ -127,25 +128,24 @@ public class Asteroid extends SpaceObject {
 		
 		double xPosChild1 = this.getPosition().getX()+(childradius+Util.EPSILON)*Math.cos(direction);
 		double yPosChild1 = this.getPosition().getY()+(childradius+Util.EPSILON)*Math.sin(direction);
-		double childVelocity = (1.5)*(getVelocity().getTotalVelocity(getVelocity().getXVelocity(),getVelocity().getYVelocity()));
+		Vector position = new Vector(xPosChild1, yPosChild1);
+		double childVelocity = (1.5)*(getVelocity().getNorm());
 		double childXVelocity = childVelocity*Math.cos(direction);
 		double childYVelocity = childVelocity*Math.sin(direction);
-		SpaceObject Child1 = new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius);
+		Vector velocity = new Vector(childXVelocity, childYVelocity);
+		SpaceObject Child1 = new Asteroid(position, velocity, childradius);
 		
 		// Create Child 2
 		
 		double xPosChild2 = this.getPosition().getX()-(childradius)*Math.cos(direction);
 		double yPosChild2 = this.getPosition().getY()-(childradius)*Math.sin(direction);
-		SpaceObject Child2 = new Asteroid(xPosChild2, yPosChild2, childXVelocity*(-1), childYVelocity*(-1), childradius);
+		Vector position2 = new Vector(xPosChild2, yPosChild2);
+		Vector velocity2 = new Vector(-1*childXVelocity, -1*childYVelocity);
+		SpaceObject Child2 = new Asteroid(position2, velocity2, childradius);
 			
 		world.removeObject(this);
-		removeWorld();
 		world.addObject(Child1);
 		world.addObject(Child2);
-			
-		Child1.setWorld(world);
-		Child2.setWorld(world);
-			
 		
 	}
 	
@@ -203,13 +203,12 @@ public class Asteroid extends SpaceObject {
 		
 		if(spaceobject instanceof Bullet)
 		{
-			spaceobject.Die();
-			Die();	
+			spaceobject.resolve(this);	
 		}
 		
 		if(spaceobject instanceof Ship)
 		{
-			spaceobject.Die();
+			spaceobject.terminate();
 		}
 		
 		

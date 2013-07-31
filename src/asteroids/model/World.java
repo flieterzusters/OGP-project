@@ -5,6 +5,7 @@ import asteroids.CollisionListener;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
+import java.util.*;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -147,6 +148,26 @@ public class World {
 	}
 	
 	/**
+	 * Returns the number of bullets this ship has fired in this world.
+	 * @param ship
+	 * 		  The ship firing the bullets.
+	 * @return amount of bullets fired by this ship.
+	 */
+
+	public int getNrOfBulletsFrom(Ship ship) {
+		
+		int bullets = 0;
+		for (SpaceObject spaceobject: Objects) {
+			if (spaceobject instanceof Bullet && ((Bullet) spaceobject).getSource() == ship) 
+			{
+				bullets++;
+			}		
+			}
+
+		return bullets;
+	}
+	
+	/**
 	 * Checks whether this world contains a certain space object.
 	 */
 	
@@ -164,33 +185,11 @@ public class World {
 	
 	public void addObject (SpaceObject object) {
 		
-		if(object == null || !object.fitsInWorld(this)) {throw new IllegalArgumentException();}
-		
+		assert (object.getWorld() == this) && (object.fitsInWorld(this)) && (object !=null) && (containsSpaceObject(object) == false);
 		object.setWorld(this);
-		boolean validSpaceObject = true;
+		Objects.add(object);
+		addModifiedSpaceObject(object);
 		
-		for(SpaceObject spaceobject : getObjects())
-		{
-			if(object instanceof Bullet)
-			{
-				if (object.overlap(spaceobject) && ((Bullet) object).getSource() != spaceobject)
-				{
-					spaceobject.Die();
-					object.Die();
-					validSpaceObject = false;
-				}
-			}
-			
-			else if(object.overlap(spaceobject))
-			{
-				validSpaceObject=false;
-			}
-		if(validSpaceObject)
-		{
-			Objects.add(object);
-		}
-		
-		}
 	}
 	
 	/**
@@ -202,135 +201,33 @@ public class World {
 		
 		if(object == null) {throw new NullPointerException();}
 		Objects.remove(object);
+		modifiedObjects.remove(object);
 		object.removeWorld();
+		removeCollisions(object);
 	}
-	
 	
 	/**
 	 * A collection of all the space objects in the world.
 	 */
-	private Set<SpaceObject> Objects;
+	private Set<SpaceObject> Objects = new HashSet<SpaceObject>();
 	
 	/**
-	 * A simple method to move all the spaceobjects in this world during a given time dt.
+	 * A simple method to move all the space objects in this world during a given time dt.
 	 * @param dt
 	 * 		  The time the objects are moved.	  
 	 */
 	public void moveAllSpaceObjects(double dt)
 	{
 		for (SpaceObject object : getObjects())
-		{object.move(dt);}
-	}
-	
-	/**
-	 * Evolves the world for an amount of time dt.
-	 * @param dt
-	 * 			The amount of the time the world has to evolve.
-	 * 
-	 * @effect 	|while(true)
-	 * 			|	timeToFirstCollision = Double.POSITIVE_INFINITY
-	 * 			|	collisionObject1=null
-	 * 			|	collisionObject2=null
-	 * 			|	
-	 * 			|	for each (SpaceObject spaceobject1 : Objects)
-	 * 			|		for each (SpaceObject spaceobject2 : Objects)
-	 * 			|			
-	 * 			|			if(!spaceobject1.equals(spaceobject2))
-	 * 			|				then double timeToCollision = spaceobject1.getTimeToCollision(spaceobject2)
-	 * 			|				
-	 * 			|				if(timeToCollision<timeToFirstCollision)
-	 * 			|						then timeToFirstCollision = timeToCollision
-	 * 			|							 collisionObject1 = spaceobject1
-	 * 			|						     collisionObject2 = spaceobject2
-	 * 			|		
-	 * 			|		if(spaceobject1.getTimeToBoundaryCollision() < timeToFirstCollision)
-	 * 			|			then timeToFirstCollision = spaceobject1.getTimeToBoundaryCollision()
-	 * 			|				 collisionObject1 = spaceobject1
-	 * 			|				 collisionObject2 = null
-	 * 			|
-	 * 			|	if(timeToFirstCollision > dt) then break;
-	 * 			|
-	 * 			| 	for each (SpaceObject spaceobject : Objects)
-	 * 			|		spaceobject.move(timeToFirstCollision)
-	 * 			|
-	 * 			| 	if(timeToFirstCollision == Double.POSITIVE_INFINITY) then break;
-	 * 			|
-	 * 			|	else if (collisionObject2 == null)
-	 * 			|		then collisionObject1.resolveBoundaryCollision()
-	 * 			|
-	 * 			|	else
-	 * 			|		collisionObject1.resolve(collisionObject2)
-	 * 			|
-	 * 			|	dt = dt - timeToFirstCollision
-	 * 			|
-	 * 			| for each (SpaceObject spaceobject : Objects)
-	 * 			|	spaceobject.move(timeToFirstCollision)
-	 * 
-	 * @throws IllegalArgumentException
-	 * 				Only if dt isn't a valid evolve argument. (see method: isValidEvolveArgument)
-	 * 
-	 * 
-	 */
-	public void evolve(double dt) throws IllegalArgumentException {
-		
-		if(!isValidEvolveArgument(dt)) { throw new IllegalArgumentException("The given argument is either not a number or is negative.");}
-		
-		double timeToFirstCollision;
-		SpaceObject collisionObject1;
-		SpaceObject collisionObject2;
-		
-		while(true) {
-			
-			timeToFirstCollision = Double.POSITIVE_INFINITY;
-			collisionObject1=null;
-			collisionObject2=null;
-			
-			for (SpaceObject spaceobject1 : Objects)
-			{
-				for (SpaceObject spaceobject2 : Objects)
-				{
-					if(!spaceobject1.equals(spaceobject2))
-					{
-						double timeToCollision = spaceobject1.getTimeToCollision(spaceobject2);
-			
-						if(timeToCollision<timeToFirstCollision)
-						{
-							timeToFirstCollision = timeToCollision;
-							collisionObject1 = spaceobject1;
-							collisionObject2 = spaceobject2;
-						}
-					}
-				}
-		
-				if(spaceobject1.getTimeToBoundaryCollision() < timeToFirstCollision)
-				{
-					timeToFirstCollision = spaceobject1.getTimeToBoundaryCollision();
-					collisionObject1 = spaceobject1;
-					collisionObject2 = null;
-				}
-			}
-				
-			if(timeToFirstCollision > dt || timeToFirstCollision == Double.POSITIVE_INFINITY)
-				break;
-			
-			moveAllSpaceObjects(timeToFirstCollision);
-	
-			if (collisionObject2 == null)
-			{
-				collisionObject1.resolveBoundaryCollision();
-			}
-				
-			else
-			{
-				collisionObject1.resolve(collisionObject2);
-			}
-				
-			dt = dt - timeToFirstCollision;
+		{object.move(dt);
+		if(object instanceof Ship) {
+			Ship ship = (Ship) object;
+			addModifiedSpaceObject(ship);
 		}
-			
-		moveAllSpaceObjects(timeToFirstCollision);
+		}
 		
 	}
+	
 	
 	/**
 	 * Checks whether the argument is a valid argument for the method "evolve".		
@@ -373,8 +270,119 @@ public class World {
 	/**
 	 * Indicates whether the world is terminated or not.
 	 */
-	private boolean isTerminated;
+	private boolean isTerminated = false;
+	
+	
+	
+	
+	private final ArrayList<Collision> Collisions = new ArrayList<Collision>();
+	private final Set<SpaceObject> modifiedObjects = new HashSet<SpaceObject>();
+	
+	public void evolve (double dt) {
+		
+		if(!isValidEvolveArgument(dt)) {throw new IllegalArgumentException();}
+		
+		double timeToFirstCollision;
+		
+		while(true)
+		{
+			timeToFirstCollision=Double.POSITIVE_INFINITY;
+			
+			prepareCollisions();
+			if(!Collisions.isEmpty()) {timeToFirstCollision = Collisions.get(0).getCollisionTime();}
+			if(timeToFirstCollision > dt) {break;}
+			moveAllSpaceObjects(timeToFirstCollision);
+			changeCollisionsTime(timeToFirstCollision);
+			if(timeToFirstCollision == Double.POSITIVE_INFINITY) {break;}
+			else {
+				this.Collisions.get(0).resolve();
+			}
+			dt = dt - timeToFirstCollision;
+		}
+		moveAllSpaceObjects(dt);
+		changeCollisionsTime(dt);
+	}
+			
+			
+	private void prepareCollisions()
+	{
+		for (SpaceObject spaceobject : modifiedObjects) {
+			removeCollisions(spaceobject);
+		}
+		for (SpaceObject spaceobject1 : modifiedObjects) {
+			for (SpaceObject spaceobject2 : Objects) {
+				if (! spaceobject1.equals(spaceobject2) ) {
+					double collisiontime = spaceobject1.getTimeToCollision(spaceobject2);
+					if (collisiontime != Double.POSITIVE_INFINITY) {
+						addCollision(new Collision(collisiontime, spaceobject1, spaceobject2));}
+				}
+			}
+			double timeToBoundaryCollision = spaceobject1.getTimeToBoundaryCollision();
+			if (timeToBoundaryCollision != Double.POSITIVE_INFINITY) 
+				addCollision(new Collision(timeToBoundaryCollision, spaceobject1));
+			}
 
+		
+		modifiedObjects.clear();
+	}
 	
-}
+	private void removeCollisions(SpaceObject spaceobject)
+	{
+		for(int i = 0; i<Collisions.size();i++) {
+				if (Collisions.get(i).attachedSpaceObject(spaceobject)) {
+					this.Collisions.remove(i);
+					i--;}
+					
+		}
+	}
 	
+	public void addModifiedSpaceObject(SpaceObject spaceobject)
+	{
+		if(!modifiedObjects.contains(spaceobject) && spaceobject.getWorld() == this)
+			this.modifiedObjects.add(spaceobject);
+	}
+	
+	private void addCollision(Collision collision) 
+	{
+		if(Collisions.isEmpty()) {Collisions.add(0, collision);}
+		else
+		{
+			for(int i=0; i<Collisions.size(); i++)
+			{
+				if(Collisions.get(i).getCollisionTime() > collision.getCollisionTime())
+				{
+					Collisions.add(i, collision);
+					i = Collisions.size();
+				}
+				if(i== Collisions.size()-1)
+					{
+					Collisions.add(collision);
+					i = Collisions.size();
+					}
+
+
+			}
+		}
+	}
+		
+		private void changeCollisionsTime(double dt) 
+		{
+			for(Collision collision: Collisions)
+			{
+				collision.evolve(dt);
+			}
+		}
+	
+			
+			
+			
+			
+			
+			
+		
+		
+		
+				
+
+		
+	}

@@ -60,14 +60,14 @@ public class Ship extends SpaceObject {
 	 *       | (! isValidMass(mass))     
 	 */
 	
-	public Ship(double x, double y, double xVelocity,
-			double yVelocity, double radius, double angle, double mass) {
+	public Ship(Vector position, Vector velocity, double radius, double angle, double mass) {
 		
-		super( x, y, xVelocity, yVelocity, radius);							
+		super(position, velocity, radius);							
 		setAngle(angle);
 		setMass(mass);
 		setAcceleration(mass);
 		}
+	
 	
 	
 	
@@ -110,9 +110,9 @@ public class Ship extends SpaceObject {
 		
 		if (dt>0){
 			
-		double xpos = (getPosition().getX() + getVelocity().getXVelocity()*dt);
-		double ypos = (getPosition().getY() + getVelocity().getYVelocity()*dt);
-		Position.setPosition(new Position(xpos,ypos));
+		double xpos = (getPosition().getX() + getVelocity().getX()*dt);
+		double ypos = (getPosition().getY() + getVelocity().getY()*dt);
+		setPosition(new Vector(xpos,ypos));
 		thrust(dt);
 		}
 	}
@@ -166,9 +166,9 @@ public class Ship extends SpaceObject {
 		
 		if (thrusterActive) {
 		
-		double xVelocity = (this.getVelocity().getXVelocity() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
-		double yVelocity = (this.getVelocity().getYVelocity() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
-		getVelocity().setVelocity(xVelocity, yVelocity);
+		double xVelocity = (this.getVelocity().getX() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
+		double yVelocity = (this.getVelocity().getY() + (dt*this.getAcceleration()*Math.cos(this.getDirection())));
+		setVelocity(new Vector(xVelocity, yVelocity));
 		}
 		
 	}
@@ -267,16 +267,25 @@ public class Ship extends SpaceObject {
 	
 	public void fireBullet() {
 		
-		if(this.getWorld()==null) {return;}
+		if(this.getWorld()==null || this.getWorld().getNrOfBulletsFrom(this) >= 3) {return;}
 		
 		double bulletRadius = 3;
 		double bulletSpeed = 250;
-		double bulletXPos = this.getPosition().getX() + Math.cos(this.getDirection())*(this.getRadius()+ bulletRadius);
-		double bulletYPos = this.getPosition().getY() + Math.sin(this.getDirection())*(this.getRadius()+ bulletRadius);
-		double bulletXVelocity = Math.cos(this.getDirection())* bulletSpeed;
-		double bulletYVelocity = Math.sin(this.getDirection())* bulletSpeed;
-		Bullet bullet = new Bullet(bulletXPos, bulletYPos, bulletXVelocity, bulletYVelocity, bulletRadius, this.getWorld(), this);
+		Vector addPosition = new Vector(Math.cos(getDirection())*(getRadius()+ bulletRadius),Math.sin(getDirection())*(getRadius()+ bulletRadius));
+		Vector position = getPosition().add(addPosition);
+		Vector addVelocity = new Vector(Math.cos(getDirection())*bulletSpeed,Math.sin(getDirection())*bulletSpeed);
+		Vector velocity = getVelocity().add(addVelocity);
+		Bullet bullet = new Bullet(position, velocity, bulletRadius, this.getWorld(), this);
 		this.getWorld().addObject(bullet);
+		for (SpaceObject secondObject : getWorld().getObjects())
+		{
+			if(bullet.overlap(secondObject) && bullet != secondObject) {
+				bullet.resolve(secondObject);
+				return;
+			}
+			
+		}
+		
 	}
 	
 	/**
@@ -301,7 +310,7 @@ public class Ship extends SpaceObject {
 			resolveCollision(spaceobject);}
 		
 		if(spaceobject instanceof Asteroid) {
-			this.Die();}
+			this.terminate();}
 		
 		if(spaceobject instanceof Bullet) {
 			spaceobject.resolve(this);}

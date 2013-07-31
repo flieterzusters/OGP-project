@@ -48,10 +48,9 @@ public class Bullet extends SpaceObject {
 	 * 		  | new.getSource() == source
 	 */
 	
-	public Bullet(double x, double y, double xVelocity,
-			double yVelocity, double radius, World world, Ship source) {
+	public Bullet(Vector position, Vector velocity, double radius, World world, Ship source) {
 		
-		super(x, y, xVelocity, yVelocity, radius);
+		super(position, velocity, radius);
 		if(isValidSource(source)){
 			this.source = source;}
 		}
@@ -106,26 +105,11 @@ public class Bullet extends SpaceObject {
 	 */
 	private Ship source;
 	
-	/**
-	 * Returns the number of bounces the bullet has made.
-	 * @return The number of bounces the bullet has made.
-	 */
-	public int getNumberOfBounces() {
-		return numberOfBounces;
-	}
 	
 	/**
-	 * Sets the number of bounces the bullet has made.
-	 * @param bounce Number of bounces the bullet makes.
+	 * False if the bullet hasn't bounced on a wall, true if it has bounced.
 	 */
-	public void setNumberOfBounces(int bounce) {
-		this.numberOfBounces = bounce;
-	}
-	
-	/**
-	 * Number of bounces the bullet has made.
-	 */
-	private int numberOfBounces=0;
+	private boolean bounced=false;
 	
 	/**
 	 * Returns the initial speed of the bullet, expressed in km/s.
@@ -149,8 +133,7 @@ public class Bullet extends SpaceObject {
 	@Override
 	public void resolveBoundaryCollision()
 	{
-		this.numberOfBounces++;
-		if (numberOfBounces == 2) {this.Die();}
+		if (bounced) {this.terminate();}
 		
 		else {super.resolveBoundaryCollision();}
 		
@@ -174,13 +157,13 @@ public class Bullet extends SpaceObject {
 	{
 		if(spaceobject == source) 
 		{
-			this.Die();
+			this.terminate();
 		}
 		
 		else
 		{
-				Die();
-				spaceobject.Die();
+				terminate();
+				spaceobject.terminate();
 		}
 			
 			

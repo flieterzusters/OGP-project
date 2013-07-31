@@ -43,11 +43,10 @@ public abstract class SpaceObject {
 	 * 		   |isValidRadius(getRadius())
 	 *
 	 */
-	public SpaceObject(double x, double y, double xVelocity,
-			double yVelocity, double radius) throws IllegalArgumentException {
+	public SpaceObject(Vector position, Vector velocity, double radius) throws IllegalArgumentException {
 		
-		this.Position = new Position(x,y);
-		this.Velocity = new Velocity(xVelocity, yVelocity);							
+		setPosition(position);
+		setVelocity(velocity);							
 		if (isValidRadius(radius)) this.radius = radius; 
 		else {
 				throw new IllegalArgumentException ("The provided radius is either not a number or is too small.");
@@ -59,7 +58,7 @@ public abstract class SpaceObject {
 	 * @return The space object's current position in space.
 	 */
 	@Basic
-	public Position getPosition() {
+	public Vector getPosition() {
 		
 		return this.Position;
 	}
@@ -69,7 +68,8 @@ public abstract class SpaceObject {
 	 * @param newPos
 	 * 		  The new position for this space object.
 	 */
-	public void setPosition(Position newPos) {
+	public void setPosition(Vector newPos) {
+		if(newPos == null) {throw new NullPointerException();}
 		this.Position = newPos;
 		
 	}
@@ -77,7 +77,62 @@ public abstract class SpaceObject {
 	/**
 	 * The current position of the space object.
 	 */
-	protected Position Position;
+	protected Vector Position;
+	
+	/**
+	 * @return The space object's current velocity in space(km/s).
+	 */
+	@Basic
+	public Vector getVelocity() {
+		
+		return this.Velocity;
+	}
+	
+	
+	
+	/**
+	 * Sets the given velocity as the new Velocity of the space object.
+	 * @param newVelocity
+	 * 		  The new velocity of the ship.
+	 */
+	@Raw
+	public void setVelocity(Vector newVelocity) {
+		if(!isValidVelocity(newVelocity)) {
+			double factor = (SPEED_OF_LIGHT)/(newVelocity.getNorm());
+			this.Velocity = new Vector(newVelocity.getX()*factor,newVelocity.getY()*factor);
+		}
+		this.Velocity = newVelocity;
+	}
+	
+	/**
+	 * Return true if the given velocity is a valid value.
+	 * The given velocity may not exceed the maximum velocity or not be less than
+	 * zero, and must be a number.
+	 * @param 	velocity
+	 * 			The velocity to check.
+	 * @return	True if and only if the given velocity does not exceed the
+	 * 			maximum velocity, is not less than zero and is a number.
+	 * 			| result ==
+	 * 			|	velocity <= maxVelocity
+	 * 			|	velocity >= 0
+	 * 			|	!Double.isNaN(velocity)
+	 */
+	private boolean isValidVelocity(Vector velocity){
+		return velocity.getNorm() < SPEED_OF_LIGHT;
+	}
+	
+	/**
+	 * The speed of light.
+	 */
+	public static final double SPEED_OF_LIGHT = 300000;
+
+	
+
+	/**
+	 * The space object's current velocity in space.
+	 */
+	protected Vector Velocity;
+	
 	
 	
 	
@@ -96,47 +151,16 @@ public abstract class SpaceObject {
 		
 		if (dt>0){
 			
-		double xpos = (getPosition().getX() + getVelocity().getXVelocity()*dt);
-		double ypos = (getPosition().getY() + getVelocity().getYVelocity()*dt);
-		Position.setPosition(new Position(xpos,ypos));
-		
-		if (this instanceof Ship) {
-			Ship ship = (Ship) this;
-			ship.thrust(dt);
-		}}
+		double xpos = (getPosition().getX() + getVelocity().getX()*dt);
+		double ypos = (getPosition().getY() + getVelocity().getY()*dt);
+		setPosition(new Vector(xpos,ypos));
+		}
 		
 		
 		
 	}
 	
 	
-	/**
-	 * @return The space object's current velocity in space(km/s).
-	 */
-	@Basic
-	public Velocity getVelocity() {
-		
-		return this.Velocity;
-	}
-	
-	
-	
-	/**
-	 * Sets the given velocity as the new Velocity of the space object.
-	 * @param newVelocity
-	 * 		  The new velocity of the ship.
-	 */
-	@Raw
-	public void setVelocity(Velocity newVelocity) {
-		this.Velocity = newVelocity;
-	}
-	
-	
-	
-	/**
-	 * The space object's current velocity in space.
-	 */
-	protected Velocity Velocity;
 	
 	/**
 	 * @return The world containing this object, null if this space object has no world.
@@ -194,8 +218,6 @@ public abstract class SpaceObject {
 	public void removeWorld () {
 		if(this.hasWorld())
 		{
-			World world = this.getWorld();
-			world.removeObject(this);
 			this.setWorld(null);
 			
 		}
@@ -206,12 +228,12 @@ public abstract class SpaceObject {
 	 * 		  The world we check to see either this spaceobject fits in it or not.
 	 */
 	public boolean fitsInWorld (World world) {
-		if (world == null) {return false;}
+		
 		double xpos = getPosition().getX();
 		double ypos = getPosition().getY();
 		double radius = getRadius();
 		
-		if (xpos-radius < 0 || xpos+radius > world.getWorldWidth() || ypos-radius < 0 || ypos+radius > world.getWorldHeight())
+		if (xpos-radius <= 0 || xpos+radius >= world.getWorldWidth() || ypos-radius <= 0 || ypos+radius >= world.getWorldHeight())
 		{
 			return false;
 		}
@@ -315,8 +337,6 @@ public abstract class SpaceObject {
 		
 	}
 
-	
-	
 	/**
 	 * Returns true if and only if this space object overlaps with the given space object. A space object always overlaps with itself. Two adjacent space objects are considered to overlap.
 	 * @param secondObject 
@@ -365,23 +385,31 @@ public abstract class SpaceObject {
 	 */
 	
 	public double getTimeToCollision(SpaceObject secondObject) {
-		if (secondObject == null) throw new NullPointerException();
+	
 		
-		else {
-			double sigmaSquared = Math.pow(getSumOfRadii(secondObject), 2);
-			double deltaVSquared = Math.pow(secondObject.getVelocity().getXVelocity() - this.getVelocity().getXVelocity(), 2) 
-								 + Math.pow(secondObject.getVelocity().getYVelocity() - this.getVelocity().getYVelocity(), 2);	
-			double deltaRSquared = Math.pow(secondObject.getPosition().getX() - this.getPosition().getX(), 2) + Math.pow(secondObject.getPosition().getY() - this.getPosition().getY(), 2);
-			double deltaVDeltaR = (secondObject.getVelocity().getXVelocity() - this.getVelocity().getXVelocity())*(secondObject.getPosition().getX() - this.getPosition().getX()) 
-								+ (secondObject.getVelocity().getYVelocity() - this.getVelocity().getYVelocity())*(secondObject.getPosition().getY() - this.getPosition().getY());
-			double d  = Math.pow(deltaVDeltaR, 2) - deltaVSquared*(deltaRSquared - sigmaSquared);
-			double deltaT;
-			if(Util.fuzzyEquals(deltaVDeltaR, 0) || deltaVDeltaR > 0 ) deltaT = Double.POSITIVE_INFINITY;
-			else if (Util.fuzzyLessThanOrEqualTo(d, 0)) deltaT = Double.POSITIVE_INFINITY;
-			else deltaT = -(deltaVDeltaR + Math.sqrt(d))/(deltaVSquared);
-			return deltaT;
+		Vector deltaR 		= secondObject.getPosition().subtract(this.getPosition());
+		Vector deltaV 		= secondObject.getVelocity().subtract(this.getVelocity());
+		double sigma 		= getRadius() + secondObject.getRadius();
+		double deltaVdeltaR = deltaV.multiply(deltaR);
+		double RSquared		= deltaR.multiply(deltaR);
+		double VSquared		= deltaV.multiply(deltaV);
+		double d 			= Math.pow(deltaVdeltaR, 2) - VSquared*(RSquared - Math.pow(sigma, 2));
+
+							
+		if(deltaVdeltaR >= 0||d < 0  )
+		{
+			return Double.POSITIVE_INFINITY;
 		}
+		else
+		{
+			return -(deltaVdeltaR + Math.sqrt(d))/(VSquared);
+		}				
+
 	}
+		
+	
+	
+	
 	
 	/**
 	 * Returns the position of the collision with the given space object or Double.POSITIVE_INFINITY if they never collide.
@@ -461,42 +489,37 @@ public abstract class SpaceObject {
 		double sigma = getSumOfRadii(secondObject);
 		double deltaRx = secondObject.getPosition().getX()-this.getPosition().getX();
 		double deltaRy = secondObject.getPosition().getY()-this.getPosition().getY();
-		double deltaVx = secondObject.getVelocity().getXVelocity()- this.getVelocity().getXVelocity();
-		double deltaVy = secondObject.getVelocity().getYVelocity()-this.getVelocity().getYVelocity();
+		double deltaVx = secondObject.getVelocity().getX()- this.getVelocity().getX();
+		double deltaVy = secondObject.getVelocity().getY()-this.getVelocity().getY();
 		double deltaVR = (deltaVx*deltaRx)+(deltaVy*deltaRy);
 	
 		double J = (2*this.getMass()*secondObject.getMass()*deltaVR)/(sigma*(this.getMass()+secondObject.getMass()));
 		double Jx = (J*deltaRx)/(sigma);
 		double Jy = (J*deltaRy)/(sigma);
-		double newxvelocity = this.getVelocity().getXVelocity()+(Jx/this.getMass());
-		double newyvelocity = this.getVelocity().getYVelocity()+(Jy/this.getMass());
-		getVelocity().setVelocity(newxvelocity,newyvelocity);
-		double newxvelocity2 = secondObject.getVelocity().getXVelocity()-(Jx/secondObject.getMass());
-		double newyvelocity2 = secondObject.getVelocity().getYVelocity()-(Jy/secondObject.getMass());
-		secondObject.getVelocity().setVelocity(newxvelocity2,newyvelocity2);
-			
+		double newxvelocity = this.getVelocity().getX()+(Jx/this.getMass());
+		double newyvelocity = this.getVelocity().getY()+(Jy/this.getMass());
+		setVelocity(new Vector(newxvelocity,newyvelocity));
+		double newxvelocity2 = secondObject.getVelocity().getX()-(Jx/secondObject.getMass());
+		double newyvelocity2 = secondObject.getVelocity().getY()-(Jy/secondObject.getMass());
+		secondObject.setVelocity(new Vector(newxvelocity2,newyvelocity2));
+		secondObject.getWorld().addModifiedSpaceObject(secondObject);
 	}
-		
-		
-		
 	
 	/**
-	 * Terminates this object. The object will be removed from its current world.
 	 * 
-	 * @effect If this object is in a world, it will be removed from that world.
-	 * 			| getWorld().removeObject(this)
-	 * 			| removeWorld()
 	 */
-	protected void Die() {
-		
-		if(this.getWorld() != null) {
-		this.getWorld().removeObject(this);
-		this.removeWorld();
-		}
-		else {throw new NullPointerException();}
-		
-			
+	
+	public boolean boundaryTouch() {
+		boolean touch = false;
+		double xpos = this.getPosition().getX();
+		double ypos = this.getPosition().getY();
+		if(Util.fuzzyEquals(xpos-this.getRadius(),0)) {touch = true;}
+		else if(Util.fuzzyEquals(xpos+this.getRadius(), this.getWorld().getWorldWidth())) {touch = true;}
+		else if(Util.fuzzyEquals(ypos-this.getRadius(), 0)) { touch=true;}
+		else if(Util.fuzzyEquals(ypos+this.radius, this.getWorld().getWorldHeight())) {touch=true;}
+		return touch;
 	}
+		
 	
 	/**
 	 * Returns the time (in seconds) when the object will collide with a boundary of his world.
@@ -537,33 +560,23 @@ public abstract class SpaceObject {
 		double timeToBoundaryX;
 		double timeToBoundaryY;
 
-		if(Util.fuzzyLessThanOrEqualTo(this.getVelocity().getYVelocity(),0)) {
+		if(Util.fuzzyLessThanOrEqualTo(this.getVelocity().getY(),0)) {
 			
-			timeToBoundaryY = Math.abs((getPosition().getY()- getRadius())/(getVelocity().getYVelocity()));}
-		
-		else if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity().getYVelocity(),0)) {
-			
-			timeToBoundaryY = Math.abs((worldheight - getPosition().getY() - getRadius())/(getVelocity().getYVelocity()));
-		}
+			timeToBoundaryY = Math.abs((getPosition().getY()- getRadius())/(getVelocity().getY()));}
 		
 		else {
-			timeToBoundaryY = Double.POSITIVE_INFINITY;
+			
+			timeToBoundaryY = Math.abs((worldheight - getPosition().getY() - getRadius())/(getVelocity().getY()));
 		}
 		
-		if(Util.fuzzyLessThanOrEqualTo(this.getVelocity().getXVelocity(),0)) {
+		if(Util.fuzzyLessThanOrEqualTo(this.getVelocity().getX(),0)) {
 			
-			timeToBoundaryX = Math.abs((getPosition().getX()- getRadius())/(getVelocity().getXVelocity()));}
-		
-		else if (!Util.fuzzyLessThanOrEqualTo(this.getVelocity().getXVelocity(),0)) {
-			
-			timeToBoundaryX = Math.abs((worldwidth - getPosition().getX() - getRadius())/(getVelocity().getXVelocity()));
-		}
+			timeToBoundaryX = Math.abs((getPosition().getX()- getRadius())/(getVelocity().getX()));}
 		
 		else {
-			timeToBoundaryX = Double.POSITIVE_INFINITY;
+			
+			timeToBoundaryX = Math.abs((worldwidth - getPosition().getX() - getRadius())/(getVelocity().getX()));
 		}
-		
-		
 		
 		
 		return Math.min(timeToBoundaryX, timeToBoundaryY);
@@ -593,11 +606,12 @@ public abstract class SpaceObject {
 		if(Util.fuzzyEquals(getPosition().getX(),getRadius()) || 
 				Util.fuzzyEquals((getPosition().getX() + getRadius()), getWorld().getWorldWidth())) {
 			
-			getVelocity().setVelocity(-(this.getVelocity().getXVelocity()),this.getVelocity().getYVelocity());
+			setVelocity(new Vector(-(this.getVelocity().getX()),this.getVelocity().getY()));
 		}
 		
 		else {
-			getVelocity().setVelocity(this.getVelocity().getXVelocity(),-(this.getVelocity().getYVelocity()));}
+			setVelocity(new Vector(this.getVelocity().getX(),-(this.getVelocity().getY())));}
+		getWorld().addModifiedSpaceObject(this);
 		
 		
 	}
@@ -610,12 +624,15 @@ public abstract class SpaceObject {
 	public abstract void resolve(SpaceObject collisionobject);
 	
 	/**
-	 * This method terminates a space object.
+	 * Terminates this object. The object will be removed from its current world.
 	 * 
+	 * @effect If this object is in a world, it will be removed from that world.
+	 * 	
 	 */
-	public void terminate()
+	protected void terminate()
 	{
-		this.removeWorld();
+		if(getWorld() == null) {throw new NullPointerException();}
+		getWorld().removeObject(this);
 		this.setState(State.TERMINATED);
 	}
 	
@@ -637,12 +654,6 @@ public abstract class SpaceObject {
 		
 		
 
-			
-		
-	
-	
-		
-	
 	
 	
 		

@@ -73,9 +73,8 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	@Override
 	public void addShip(World world, Ship ship) 
 	{
-		try {world.addObject(ship);
-			ship.setWorld(world);}	
-		catch (IllegalObjectException illegalobject){
+		try {world.addObject(ship);}	
+		catch (IllegalArgumentException illegalobject){
 			throw new ModelException (illegalobject);}
 		
 	}
@@ -83,9 +82,8 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	@Override
 	public void addAsteroid(World world, Asteroid asteroid) 
 	{
-		try {world.addObject(asteroid);
-			asteroid.setWorld(world);}	
-		catch (IllegalObjectException illegalobject){
+		try {world.addObject(asteroid);}	
+		catch (IllegalArgumentException illegalobject){
 		throw new ModelException (illegalobject);}
 	}
 	
@@ -122,8 +120,13 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	public Ship createShip(double x, double y, double xVelocity,
 			double yVelocity, double radius, double angle, double mass) throws ModelException {
 		
-		try {Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, angle, mass);
-		return ship1;}
+		try 
+		{
+			Vector position = new Vector(x,y);
+			Vector velocity = new Vector(xVelocity, yVelocity);
+			Ship ship1 = new Ship(position, velocity, radius, angle, mass);
+			return ship1;
+		}
 		catch (IllegalArgumentException illegalargument){
 			throw new ModelException (illegalargument);}
 		
@@ -154,14 +157,14 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	@Override
 	public double getShipXVelocity(Ship ship) 
 	{
-		return ship.getVelocity().getXVelocity();
+		return ship.getVelocity().getX();
 	}
 	
 
 	@Override
 	public double getShipYVelocity(Ship ship) 
 	{
-		return ship.getVelocity().getYVelocity();
+		return ship.getVelocity().getY();
 	}
 	
 
@@ -211,14 +214,23 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	@Override
 	public void fireBullet(Ship ship) 
 	{
-		ship.fireBullet();
+		try {
+		ship.fireBullet();}
+		catch (IllegalArgumentException illegalargument) {
+			throw new ModelException (illegalargument);
+		}
 	}
 		
 	@Override
 	public Asteroid createAsteroid(double x, double y, double xVelocity, double yVelocity, double radius) throws ModelException {
 		
-		try {Asteroid asteroid = new Asteroid (x, y, xVelocity, yVelocity, radius);
-		return asteroid;}
+		try 
+		{
+			Vector position = new Vector (x,y);
+			Vector velocity = new Vector(xVelocity, yVelocity);
+			Asteroid asteroid = new Asteroid (position, velocity, radius);
+			return asteroid;
+		}
 		catch (IllegalArgumentException illegalargument){
 			throw new ModelException (illegalargument);}
 	}
@@ -226,7 +238,11 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	@Override
 	public Asteroid createAsteroid(double x, double y, double xVelocity, double yVelocity, double radius, Random random) throws ModelException {
 		
-		try {Asteroid asteroid = new Asteroid (x,y,xVelocity, yVelocity, radius, random);
+		try 
+		{
+			Vector position = new Vector(x,y);
+			Vector velocity = new Vector(xVelocity, yVelocity);
+			Asteroid asteroid = new Asteroid (position, velocity, radius, random);
 		return asteroid;}
 		catch (IllegalArgumentException illegalargument){
 			throw new ModelException (illegalargument);}
@@ -258,13 +274,13 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	  
 	public double getAsteroidXVelocity(Asteroid asteroid) 
 	{
-		return asteroid.getVelocity().getXVelocity();
+		return asteroid.getVelocity().getX();
 	}
 
 	 
 	public double getAsteroidYVelocity(Asteroid asteroid) 
 	{
-		return asteroid.getVelocity().getYVelocity();
+		return asteroid.getVelocity().getY();
 	}
 
 	 
@@ -305,12 +321,12 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 
 	public double getBulletXVelocity (Bullet bullet) 
 	{
-		return bullet.getVelocity().getXVelocity();
+		return bullet.getVelocity().getX();
 	}
 
 	public double getBulletYVelocity(Bullet bullet) 
 	{
-		return bullet.getVelocity().getYVelocity();
+		return bullet.getVelocity().getY();
 	}
 
 	public double getBulletRadius(Bullet bullet) 

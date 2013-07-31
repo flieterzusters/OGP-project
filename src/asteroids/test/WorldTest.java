@@ -88,7 +88,7 @@ public class WorldTest {
 		world.addObject(ship);
 	}
 	
-	@Test (expected=IllegalObjectException.class)
+	@Test (expected=IllegalArgumentException.class)
 	public void testAddObject_validSpaceObj() {
 		Asteroid asteroid = new Asteroid(49, 49, 300, -210, 20);
 		worldWithObj.addObject(asteroid);
