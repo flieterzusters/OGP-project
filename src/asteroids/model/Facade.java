@@ -354,17 +354,17 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 		 
 		ProgramFactoryImplementation factory = new ProgramFactoryImplementation();
 		    ProgramParser<Expression, Statement, Type> parser = new ProgramParser<>(factory);
-		    try {parser.parse(text);
+		    try {Program program = new Program();
+        		factory.setProgram(program);
+		    	parser.parse(text);
 		        List<String> errors = parser.getErrors();
 		        if(! errors.isEmpty()) {
 		          return ParseOutcome.failure(errors.get(0));
 		        } else {
-		        	Statement statement = parser.getStatement();
-		        	Program program = new Program();
+		        	
 		        	program.setGlobals(parser.getGlobals());
-		        	program.setStatement(statement);
-		        	factory.setProgram(program);
-		          return ParseOutcome.success(program); 
+		        	program.setStatement(parser.getStatement());
+		        	return ParseOutcome.success(program); 
 		        }
 		    } catch(RecognitionException e) {
 		      return ParseOutcome.failure(e.getMessage());
@@ -380,10 +380,18 @@ public class Facade implements IFacade<World, Ship, Asteroid, Bullet, asteroids.
 	}
 
 	@Override
-	public asteroids.IFacade.ParseOutcome<Program> loadProgramFromUrl(URL url)
-			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	public asteroids.IFacade.ParseOutcome<Program> loadProgramFromUrl(URL url) throws IOException {
+		
+		StringBuilder builder = new StringBuilder();
+		Scanner scanner = new Scanner(new File("/Users/Tom/Downloads/Herexamen Programmeren/asteroids-part3-aug/asteroids-part3-aug/src/asteroids/resources/program.txt"));
+		while (scanner.hasNextLine()){
+			builder.append(scanner.nextLine());
+			builder.append("\n");
+		}
+		scanner.close();
+		String text = builder.toString();
+		return parseProgram(text);
+		
 	}
 
 	@Override

@@ -22,9 +22,7 @@ public class WorldTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		ship1 = new Ship(50, 50, 100, 200, 15, 0, 100);
-		asteroid1 = new Asteroid(300, 400, -45, -60, 20);
-		bullet1 = new Bullet(500, 700, 60, -20, 40, worldWithObj, bulletSource);
+		
 		worldWithObj = new World(1000, 1000);
 		worldWithObj.addObject(ship1);
 		worldWithObj.addObject(bullet1);
@@ -86,13 +84,6 @@ public class WorldTest {
 		World world = new World (800,800);
 		Ship ship = null;
 		world.addObject(ship);
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testAddObject_validSpaceObj() {
-		Asteroid asteroid = new Asteroid(49, 49, 300, -210, 20);
-		worldWithObj.addObject(asteroid);
-		
 	}
 	
 	@Test

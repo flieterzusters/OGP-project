@@ -20,5 +20,5 @@ public class EntityT extends Type {
 		return value;
 	}
 	
-	private SpaceObject value = null;
+	private SpaceObject value;
 }

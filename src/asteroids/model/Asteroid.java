@@ -11,13 +11,8 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class of asteroids that have a position, velocity, radius and mass.
- * 
- * @invar An asteroid's speed limit can never exceed the speed of light (c=300000 km/s).
- * 		  | getAsteroidSpeedLimit =< 300000
- * 
- * @invar An asteroids's speed can never exceed it's speed limit. 
- * 	      | getAsteroidVelocity =< getAsteroidSpeedLimit
- * 
+
+
  * @author Tom De Ferm
  * @version 0.1
  */
@@ -26,19 +21,19 @@ public class Asteroid extends SpaceObject {
 	
 	/**
 	 * Creates a new Asteroid with user defined parameters.
-	 * @param x	
-	 * 		  The initial x-coordinate of the asteroid, expressed in km.
-	 * @param y	
-	 * 		  The initial y-coordinate of the asteroid, expressed in km.
-	 * @param xVelocity 
-	 * 		  The initial velocity in the x-direction the asteroid will have, expressed in km/s.
-	 * @param yVelocity 
-	 * 		  The initial velocity in the y-direction the asteroid will have, expressed in km/s.
+	 * 
+	 * @param position
+	 * 		  The initial position of the space object.
+	 * @param velocity
+	 * 		  The initial velocity of the space object.
+	 * @param radius
+	 * 		  The initial radius of the space object.
+	 * 
 	 * @param radius 
 	 * 		  The asteroid's radius, expressed in km.
 	 * 
 	 * @effect This new asteroid is initialized as a SpaceObject with a given position, speed and radius.
-	 *        | super(x, y, xVelocity, yVelocity, radius)
+	 *        | super(position, velocity, radius)
 	 *        
 	 * @post The given random is now set as a random of this asteroid.
 	 * 		  | new.getRandom() == random
@@ -54,10 +49,8 @@ public class Asteroid extends SpaceObject {
 	
 	/**
 	 * Creates a new Asteroid with a given position, velocity and radius.
-	 * @param x
-	 * @param y
-	 * @param xVelocity
-	 * @param yVelocity
+	 * @param position
+	 * @param velocity
 	 * @param radius
 	 * @effect |this(x, y, xVelocity, yVelocity, radius, null)
 	 */
@@ -99,15 +92,15 @@ public class Asteroid extends SpaceObject {
 	 * 		| if (getRadius() >= 30)
 	 * 		| let
 	 * 		| 		childradius = (this.getRadius())/(2)
-	 * 		|		xPosChild1 = this.getX()+childradius*Math.cos(randomDouble)
-	 * 		|		yPosChild1 = this.getY()+childradius*Math.sin(randomDouble)
-	 * 		|		xPosChild2 = this.getX()-childradius*Math.cos(randomDouble)
-	 * 		|		yPosChild2 = this.getY()-childradius*Math.sin(randomDouble)
-	 * 		|		childXVelocity = childVelocity*Math.cos(randomDouble)
-	 * 		|		childYVelocity = childVelocity*Math.sin(randomDouble)
+	 * 		|		position = new Vector(getPosition().getX()+childradius*Math.cos(randomDouble), getPosition().getY()+childradius*Math.sin(randomDouble))
+	 * 		|		position2 = new Vector(getPosition().getX()-childradius*Math.cos(randomDouble), getPosition().getY()-childradius*Math.sin(randomDouble))
+	 * 		|		childVelocity = (1.5)*(getVelocity().getNorm())
+	 * 		|		velocity = new Vector(childVelocity*Math.cos(randomDouble), childVelocity*Math.sin(direction))
+	 * 		|		position2 = new Vector(getPosition().getX()-(childradius)*Math.cos(direction), getPosition().getY()-(childradius)*Math.sin(direction))
+	 * 		|		velocity2 = (-1)*velocity
 	 * 		| in
-	 * 		|		getWorld().addObject(new Asteroid(xPosChild1, yPosChild1, childXVelocity, childYVelocity, childradius, getRandom()))
-	 * 		|		getWorld().addObject(new Asteroid(xPosChild2, yPosChild2, -childXVelocity, -childYVelocity, childradius, getRandom()))
+	 * 		|		getWorld().addObject(new Asteroid(position, velocity, childradius)
+	 * 		|		getWorld().addObject(new Asteroid(position2, velocity2, childradius)
 	 */
 	@Override
 	public void terminate() {
@@ -184,14 +177,13 @@ public class Asteroid extends SpaceObject {
 	 * @effect If the other space object is an asteroid, the asteroids will bounce off each other.
 	 * 			|if(spaceobject instanceof Asteroid)
 	 * 			|	then resolveCollision(spaceobject)
-	 * @effect If the other space object is a bullet, both objects die.
+	 * @effect If the other space object is a bullet, the collision will be resolved in the class Bullet.
 	 *  		|if(spaceobject instanceof Bullet)
 	 *  		|then
-	 *  		|	spaceobject.Die()
-	 *  		|	Die()
-	 * @effect If the other spaceobject is a ship, the ship will die and the asteroid remains unaffected.
+	 *  		|	spaceobject.resolve(this)
+	 * @effect If the other space object is a ship, the ship will die and the asteroid remains unaffected.
 	 *  		| if (spaceobject instanceof Ship)
-	 *  		|then spaceobject.Die()
+	 *  		|then spaceobject.terminate()
 	 */
 	@Override
 	public void resolve(SpaceObject spaceobject)

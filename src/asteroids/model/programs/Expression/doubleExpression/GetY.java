@@ -1,20 +1,21 @@
 package asteroids.model.programs.Expression.doubleExpression;
 import asteroids.model.programs.Expression.*;
-import asteroids.model.programs.Expression.standardExpression.*;
+
 
 public class GetY extends DoubleExpression {
 	
 	public GetY (int line, int column, Expression e) {
 		super(line, column);
-		this.object = (EntityLiteral) e;
+		this.spaceobject = e;
 	}
 	
 	@Override
 	public double getValue() {
-		return object.getValue().getPosition().getY();
+		EntityLiteral ship = (EntityLiteral) spaceobject ;
+		return ship.getValue().getPosition().getY();
 	}
 	
-	private EntityLiteral object;
+	private Expression spaceobject;
 	
 
 }

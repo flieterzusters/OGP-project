@@ -9,9 +9,6 @@ public abstract class Expression extends Code {
 			setType(type);
 		}
 		
-		protected Expression(int line, int column) {
-			super(line, column);
-		}
 		
 		public Type getType() {
 			return type;

@@ -1,5 +1,4 @@
-package asteroids.model.programs.Expression.standardExpression;
-import asteroids.model.programs.Expression.*;
+package asteroids.model.programs.Expression;
 
 import asteroids.model.programs.*;
 
@@ -13,7 +12,7 @@ public class Variable extends DoubleExpression {
 	
 	@Override
 	public double getValue() {
-		Type type = getProgram().getGlobal(getString());
+		Type type = getProgram().getGlobal(value);
 		double value = ((DoubleT) type).getValue();
 		return value;
 		

@@ -1,4 +1,4 @@
-package asteroids.model.programs.Expression.standardExpression;
+package asteroids.model.programs.Expression;
 import asteroids.model.programs.Expression.*;
 
 public class DoubleLiteral extends DoubleExpression{

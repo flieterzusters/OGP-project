@@ -10,14 +10,8 @@ import be.kuleuven.cs.som.annotate.*;
 /**
  * A class of ships that have a position, velocity, radius, direction and mass.
  * Ships can move, apply thrust, turn and fire bullets. The functionality for collision detection is located in the class SpaceObject.
- * 
- * @invar A ship's speed limit can never exceed the speed of light (c=300000 km/s).
- * 		  | getSpeedLimit() =< 300000
- * 
- * @invar A ship's speed can never exceed it's speed limit. 
- * 	      | getVelocity() =< getSpeedLimit()
- * 
- * @invar The value of angle will always be between 0 and 2*Pi (inclusive)
+ *
+ * @invar The value of angle will always be between 0 and 2*Pi (inclusive).
  * 		  | 0 <= angle <= 2*Pi
  * 
  * @invar The mass of the ship must be valid at all times.
@@ -31,23 +25,20 @@ public class Ship extends SpaceObject {
 	
 	/**
 	 * Creates a new Ship with user defined parameters.
-	 * @param x	
-	 * 		  The initial x-coordinate of the ship, expressed in km.
-	 * @param y	
-	 * 		  The initial y-coordinate of the ship, expressed in km.
-	 * @param xVelocity 
-	 * 		  The initial velocity in the x-direction the ship will have, expressed in km/s.
-	 * @param yVelocity 
-	 * 		  The initial velocity in the y-direction the ship will have, expressed in km/s.
-	 * @param radius 
-	 * 		  The ship's radius, expressed in km.
+	 * 
+	 * @param position
+	 * 		  The initial position of the ship.
+	 * @param velocity
+	 * 		  The initial velocity of the ship.
+	 * @param radius
+	 * 		  The initial radius of the ship.
 	 * @param angle 
 	 * 		  The direction the ship will face, expressed in radians (0 is to the right, Pi is to the left).
 	 * @param mass 
 	 * 		  The total mass of the ship (in kg).
 	 * 
 	 * @effect This new ship is initialized as a SpaceObject with a given position, speed and radius.
-	 *        | super(x, y, xVelocity, yVelocity, radius)
+	 *        | super(position, velocity, radius)
 	 *        
 	 * @post The given angle is now set as the new direction of the ship.
 	 *       | new.getAngle() == angle
@@ -68,13 +59,9 @@ public class Ship extends SpaceObject {
 		setAcceleration(mass);
 		}
 	
-	
-	
-	
 	/**
 	 * @return The ship's current acceleration in space, expressed in km/s.
 	 */
-	
 	@Basic
 	public double getAcceleration() {
 		
@@ -155,11 +142,11 @@ public class Ship extends SpaceObject {
 	 * 
 	 * @post If the acceleration of the ship is equal to or less than zero, no change to the ship's velocity is made.
 	 * 	     | if(getAcceleration =< 0) then 
-	 *       |       new getVelocity().getXVelocity = getVelocity().getXVelocity
-	 *       |	     new getVelocity().getYVelocity = getVelocity().getYVelocity
+	 *       |       new getVelocity().getX() = getVelocity().getX()
+	 *       |	     new getVelocity().getY() = getVelocity().getY()
 	 * @post The new velocity vector is equal to the old velocity vector changed by the acceleration in the ship's current direction.
-	 *       | new getVelocity().getXVelocity = getVelocity().getXVelocity + getAcceleration*cos(angle)
-	 *       | new getVelocity().getYVelocity = getVelocity().getYVelocity + getAcceleration*sin(angle)
+	 *       | new getVelocity().getX() = getVelocity().getX() + getAcceleration*cos(angle)
+	 *       | new getVelocity().getY() = getVelocity().getY() + getAcceleration*sin(angle)
 	 * 		 
 	 */
 	public void thrust(double dt) {
@@ -298,7 +285,7 @@ public class Ship extends SpaceObject {
 	 * 			| then resolveCollision(spaceobject)
 	 * @effect If the other space object is an Asteroid, this ship dies and the asteroid remains unaffected.
 	 * 			| if (spaceobject instanceof Asteroid)
-	 * 			| then Die()
+	 * 			| then terminate()
 	 * @effect If the other space object is a Bullet, the resolve method will be called on this bullet.
 	 * 			| if (spaceobject instanceof Bullet)
 	 * 			| then spaceobject.resolve(this)
@@ -340,5 +327,17 @@ public class Ship extends SpaceObject {
 	 * The program associated with this ship.
 	 */
 	private Program program = null;
+	
+	/**
+	 * Executes a program one or multiple times depending on the parameter.
+	 * Does nothing if this ship has no program available.
+	 * @param value
+	 */
+	public void execute(int value) {
+		
+		Program program = getProgram();
+		if(program != null) {
+			program.execute(value);}
+	}
 	
 }

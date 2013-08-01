@@ -9,12 +9,6 @@ import asteroids.Util;
 /**
  * A class of bullets that have a position, velocity, radius and mass.
  * 
- * @invar A bullet's speed limit can never exceed the speed of light (c=300000 km/s).
- * 		  | getSpeedLimit =< 300000
- * 
- * @invar A bullet's speed can never exceed it's speed limit. 
- * 	      | getBulletVelocity =< getBulletSpeedLimit
- * 
  * @invar The source of this bullet must be valid at all times.
  * 		  | isValidSource(getSource())
  * 
@@ -26,23 +20,20 @@ public class Bullet extends SpaceObject {
 	
 	/**
 	 * Creates a new Bullet with user defined parameters.
-	 * @param x	
-	 * 		  The initial x-coordinate of the bullet, expressed in km.
-	 * @param y	
-	 * 		  The initial y-coordinate of the bullet, expressed in km.
-	 * @param xVelocity 
-	 * 		  The initial velocity in the x-direction the bullet will have, expressed in km/s.
-	 * @param yVelocity 
-	 * 		  The initial velocity in the y-direction the bullet will have, expressed in km/s.
-	 * @param radius 
-	 * 		  The bullet's radius, expressed in km.
+	 * 
+	 * @param position
+	 * 		  The initial position of the space object.
+	 * @param velocity
+	 * 		  The initial velocity of the space object.
+	 * @param radius
+	 * 		  The initial radius of the space object.
 	 * @param mass
 	 * 		  The mass of this bullet.
 	 * @param source
 	 * 		  The source of this bullet.
 	 * 
 	 *  @effect This new bullet is initialized as a SpaceObject with a given position, speed, radius and mass.
-	 *        | super(x, y, xVelocity, yVelocity, radius, mass)
+	 *        | super(position, velocity, radius, mass)
 	 *        
 	 * @post The given source is set as the source of this bullet.
 	 * 		  | new.getSource() == source
@@ -112,6 +103,13 @@ public class Bullet extends SpaceObject {
 	private boolean bounced=false;
 	
 	/**
+	 * Makes the bounced field true. If a bullet collides with a boundary now, it will die.
+	 */
+	public void setBounced() {
+		this.bounced = true;
+	}
+	
+	/**
 	 * Returns the initial speed of the bullet, expressed in km/s.
 	 * @return The initial speed of the bullet, expressed in km/s.
 	 */
@@ -135,7 +133,8 @@ public class Bullet extends SpaceObject {
 	{
 		if (bounced) {this.terminate();}
 		
-		else {super.resolveBoundaryCollision();}
+		else {setBounced();
+			super.resolveBoundaryCollision();}
 		
 			
 	}
@@ -147,10 +146,10 @@ public class Bullet extends SpaceObject {
 	 * 
 	 * @effect If spaceobject is the source of this bullet, only this bullet will die.
 	 * 		   Otherwise both the bullet and the spaceobject will die.
-	 * 			|if(spaceobject == source)	then this.Die()
+	 * 			|if(spaceobject == source)	then this.terminate()
 	 * 			|else
-	 * 			|	Die()
-	 * 			|	spaceobject.Die()
+	 * 			|	terminate()
+	 * 			|	spaceobject.terminate()
 	 */
 	@Override
 	public void resolve(SpaceObject spaceobject)

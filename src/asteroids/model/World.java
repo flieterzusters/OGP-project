@@ -213,17 +213,23 @@ public class World {
 	
 	/**
 	 * A simple method to move all the space objects in this world during a given time dt.
+	 * If the space object is a ship, it will also start executing programs if it has any.
 	 * @param dt
 	 * 		  The time the objects are moved.	  
 	 */
 	public void moveAllSpaceObjects(double dt)
 	{
 		for (SpaceObject object : getObjects())
-		{object.move(dt);
-		if(object instanceof Ship) {
-			Ship ship = (Ship) object;
-			addModifiedSpaceObject(ship);
-		}
+		{	object.move(dt);
+			if(object instanceof Ship) {
+				Ship ship = (Ship) object;
+				addModifiedSpaceObject(ship);
+				int times = (int) Math.floor(dt / 0.2);
+				if (times == 0){
+					times++;
+				}
+				ship.execute(times);
+			}
 		}
 		
 	}
@@ -274,10 +280,24 @@ public class World {
 	
 	
 	
-	
+	/**
+	 * An arraylist which holds collision objects.
+	 */
 	private final ArrayList<Collision> Collisions = new ArrayList<Collision>();
+	
+	/**
+	 * A set which holds all the modified objects.
+	 */
 	private final Set<SpaceObject> modifiedObjects = new HashSet<SpaceObject>();
 	
+	/**
+	 * Evolves this world with a given time interval dt.
+	 * @param dt The time over which this world has to evolve.
+	 * 
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		   Throws an illegalargumentexception if dt isn't a valid evolve argument.
+	 */
 	public void evolve (double dt) {
 		
 		if(!isValidEvolveArgument(dt)) {throw new IllegalArgumentException();}
@@ -303,7 +323,9 @@ public class World {
 		changeCollisionsTime(dt);
 	}
 			
-			
+	/**
+	 * Prepares the collisions before evolving.		
+	 */
 	private void prepareCollisions()
 	{
 		for (SpaceObject spaceobject : modifiedObjects) {
@@ -326,6 +348,10 @@ public class World {
 		modifiedObjects.clear();
 	}
 	
+	/**
+	 * Removes collisions from the Collisions arraylist.
+	 * @param spaceobject
+	 */
 	private void removeCollisions(SpaceObject spaceobject)
 	{
 		for(int i = 0; i<Collisions.size();i++) {
@@ -336,12 +362,20 @@ public class World {
 		}
 	}
 	
+	/**
+	 * Adds a space object to the set of modified space objects.
+	 * @param spaceobject
+	 */
 	public void addModifiedSpaceObject(SpaceObject spaceobject)
 	{
 		if(!modifiedObjects.contains(spaceobject) && spaceobject.getWorld() == this)
 			this.modifiedObjects.add(spaceobject);
 	}
 	
+	/**
+	 * Adds a collision to the arraylist of collisions.
+	 * @param collision
+	 */
 	private void addCollision(Collision collision) 
 	{
 		if(Collisions.isEmpty()) {Collisions.add(0, collision);}
@@ -365,6 +399,10 @@ public class World {
 		}
 	}
 		
+	/**
+	 * Changes the collision time by using the method evolve in the class Collision.
+	 * @param dt
+	 */
 		private void changeCollisionsTime(double dt) 
 		{
 			for(Collision collision: Collisions)

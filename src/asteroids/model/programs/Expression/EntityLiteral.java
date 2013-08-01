@@ -1,5 +1,5 @@
-package asteroids.model.programs.Expression.standardExpression;
-import asteroids.model.programs.Expression.*;
+package asteroids.model.programs.Expression;
+
 import asteroids.model.programs.*;
 import asteroids.model.*;
 

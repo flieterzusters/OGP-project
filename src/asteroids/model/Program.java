@@ -1,21 +1,21 @@
 package asteroids.model;
 import asteroids.model.programs.Statement.*;
-
 import asteroids.model.programs.*;
 import java.util.*;
+import asteroids.model.programs.Statement.standardStatement.*;
 
 public class Program {
 	
 	public Program(){
-		setGlobals(null);
-		setStatement(null);
-		
+		this.globals = new HashMap<String,Type>();
+		this.statement = null;
+		executeposition = 1;
 	}
 	
 	public Program(Map<String, Type> globals, Statement statement) {
 		setGlobals(globals);
 		setStatement(statement);
-		
+		executeposition = 1;
 	}
 	
 	public Map<String,Type> getGlobals() {
@@ -42,6 +42,7 @@ public class Program {
 	
 	public void setStatement(Statement statement) {
 		this.statement = statement;
+		this.statement.setProgram(this);
 	}
 	
 	private Statement statement;
@@ -55,6 +56,28 @@ public class Program {
 	}
 	
 	private Ship ship;
+	
+	public int getExecutePosition() {
+		return this.executeposition;
+	}
+	
+	public void setExecutePosition(int value) {
+		this.executeposition = value;
+	}
+	
+	private int executeposition;
+	
+	private void executeNext() {
+		((Sequence) statement).executeNextCommand(getExecutePosition());
+		
+	}
+	
+	public void execute(int value) {
+		
+		for (int i=0; i<value; i++){
+			executeNext();
+		}
+	}
 	
 
 }

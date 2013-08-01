@@ -22,40 +22,10 @@ public class ShipTest {
 
 	
 
-	@BeforeClass
-	public static void setUpBeforeClass()  {
-		
-		staticShip1 = new Ship(100, 200, 10000, 20000, 15, 0, 100);
-		staticShip2 = new Ship(-100, -200, -10000, -20000, 25, 1.75,50);
-		staticShip3 = new Ship(-100, -235, 0, 0, 10, 0,70);	
-		staticShip4 = new Ship(-105, -230, 0, 0, 10, 0,300);
-		collisionShip1 = new Ship(500, 500, -20, -20, 10, 0, 700);
-		
-		
-	}
-	@Before
-	public void setUp()  {
-		dynamicShip1 = new Ship(50, 2000, 10, 5, 20, 1,2);
-		dynamicShip2 = new Ship(-30.5, -20.1,-100, 200, 15, 3, 55);
-		testWorld = new World(1000, 1000);
-	
-		
-	}
 
 	
 	
-	@Test
-	public void constructor_IllegalRadiusTest() {
-		
-		try {
-			@SuppressWarnings("unused")
-			Ship newShip = new Ship(10, 10, 250000, 250000, 5, 0, 30);
-			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException thrown) {
-			assertThat(thrown.getMessage(), Is.is("The provided radius is either not a number or is too small."));
-		}
-	}
-	
+
 	
 	
 	

@@ -10,7 +10,7 @@ import asteroids.model.programs.Statement.actionStatement.*;
 import asteroids.model.programs.Statement.standardStatement.*;
 import asteroids.model.programs.Expression.booleanExpression.*;
 import asteroids.model.programs.Expression.doubleExpression.*;
-import asteroids.model.programs.Expression.standardExpression.*;
+
 
 public class ProgramFactoryImplementation implements ProgramFactory<Expression, Statement, Type> {
 	
@@ -60,8 +60,7 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	@Override
 	public Expression createSelf (int line, int column)
 	{
-		Ship ship = getProgram().getShip();
-		return new EntityLiteral(line, column, ship);
+		return new EntityLiteral(line, column, getProgram().getShip());
 	}
 	
 	@Override
@@ -211,7 +210,7 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	
 	@Override
 	public Statement createSequence(int line, int column, List<Statement> statements) {
-		return null;
+		return new Sequence(line, column, statements);
 	}
 	
 	@Override
