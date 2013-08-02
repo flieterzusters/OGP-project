@@ -2,6 +2,8 @@ package asteroids.model.programs.parsing;
 import asteroids.model.programs.Expression.*;
 
 import java.util.List;
+
+import asteroids.model.Program;
 import asteroids.model.Ship;
 import asteroids.model.programs.*;
 import asteroids.model.*;
@@ -60,7 +62,8 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	@Override
 	public Expression createSelf (int line, int column)
 	{
-		return new EntityLiteral(line, column, getProgram().getShip());
+		Ship currentship = getProgram().getShip();
+		return new EntityLiteral(line, column, currentship);
 	}
 	
 	@Override
@@ -210,7 +213,9 @@ public class ProgramFactoryImplementation implements ProgramFactory<Expression, 
 	
 	@Override
 	public Statement createSequence(int line, int column, List<Statement> statements) {
+		if(statements.isEmpty()) {return null;}
 		return new Sequence(line, column, statements);
+		
 	}
 	
 	@Override

@@ -191,7 +191,7 @@ public class Ship extends SpaceObject {
 	 * @pre The given angle must be a number and must be finite.
 	 *  	| (! angle.isNaN() && angle < Double.POSITIVE_INFINITY)
 	 */
-	private void setAngle(double angle) {	
+	public void setAngle(double angle) {	
 		this.angle = angle;
 		while (this.angle < 0) {
 			this.angle += 2*Math.PI;
@@ -262,7 +262,7 @@ public class Ship extends SpaceObject {
 		Vector position = getPosition().add(addPosition);
 		Vector addVelocity = new Vector(Math.cos(getDirection())*bulletSpeed,Math.sin(getDirection())*bulletSpeed);
 		Vector velocity = getVelocity().add(addVelocity);
-		Bullet bullet = new Bullet(position, velocity, bulletRadius, this.getWorld(), this);
+		Bullet bullet = new Bullet(position, velocity, bulletRadius,this);
 		this.getWorld().addObject(bullet);
 		for (SpaceObject secondObject : getWorld().getObjects())
 		{

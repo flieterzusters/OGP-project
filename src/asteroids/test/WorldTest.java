@@ -5,111 +5,76 @@ import static org.junit.Assert.*;
 import org.hamcrest.core.Is;
 import org.junit.*;
 import asteroids.model.*;
+import asteroids.model.Vector;
+import java.util.*;
 
 
 
 public class WorldTest {
 	
-	private static World emptyWorld, worldWithObj;
-	private static SpaceObject ship1, asteroid1, bullet1;
-	private static Ship bulletSource;
-	
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		emptyWorld = new World(1024, 768);
-	}
+	private static World world;
+	private static Vector position;
+	private static Vector velocity;
+	private static SpaceObject ship;
+	private static SpaceObject asteroid;
+	private static SpaceObject bullet;
+	private static Ship ship2;
 	
 	@Before
-	public void setUp() throws Exception {
-		
-		worldWithObj = new World(1000, 1000);
-		worldWithObj.addObject(ship1);
-		worldWithObj.addObject(bullet1);
-			
+	public void setUpMutableFixture() throws Exception 
+	{
+		world = new World(1024,768);
+		position = new Vector(12000,12000);
+		velocity = new Vector(18000,18000);
+		ship = new Ship(new Vector(50,50), new Vector(-5,10), 12, 3, 900 ); 
+		asteroid = new Asteroid(new Vector(200,300), new Vector(-10,-15), 20);
+		bullet = new Bullet(new Vector(500,600), new Vector(10,15), 3, (Ship) ship);
 	}
-	
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testConstructorInfiniteDimensions() {
+		world = new World (Double.POSITIVE_INFINITY,Double.NEGATIVE_INFINITY);
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testConstructorNegativeDimensions() {
+		world = new World (-1,-1);
+	}
+
 	@Test
-	public void ExtendedConstructor_legalCase() {
-		assertTrue(emptyWorld.getWorldWidth() == 1024);
-		assertTrue(emptyWorld.getWorldHeight() == 768);
-		assertTrue(emptyWorld.getObjects() == null);
-	}
-	
-	
-	@Test
-	public void ExtendedConstructor_NegativeBoundaryCase() {
-		try {
-			@SuppressWarnings("unused")
-			World world = new World(-50, -75);
-			fail("Expected IllegalArgumentException");}
-			catch (IllegalArgumentException thrown) {
-				assertThat(thrown.getMessage(), Is.is("The provided width and/or height is negative"));
-		}
-	}
-	
-	@Test
-	public void getShipsTest() {
-		World world = new World(1000, 1000);
-		world.addObject(ship1);
-		assertTrue(world.getShips() != null);
-		assertEquals(emptyWorld.getShips(),null);
-	}
-	
-	@Test
-	public void getAsteroidsTest() {
-		World world = new World(1000,1000);
-		world.addObject(asteroid1);
-		assertTrue(world.getAsteroids() != null);
-		assertEquals(emptyWorld.getAsteroids(),null);
-	}
-	
-	@Test
-	public void getBulletsTest() {
-		World world = new World (800,800);
-		world.addObject(bullet1);
-		assertTrue(world.getBullets() != null);
-		assertEquals(emptyWorld.getBullets(),null);
-	}
-	
-	@Test
-	public void testAddObject_NormalCase() {
-		World world = new World (1000,1000);
-		world.addObject(ship1);
-		assertTrue(ship1.getWorld() == world);
-	}
-	
-	@Test (expected=NullPointerException.class)
-	public void testAddObject_Null() {
-		World world = new World (800,800);
-		Ship ship = null;
+	public void testAddObject() {
 		world.addObject(ship);
 	}
-	
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testAddNullObject() {
+		Ship ship1 = null;
+		world.addObject(ship1);
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testAddObject_doesNotFitInWorld() {
+		Ship ship = new Ship (new Vector(2000, 300),new Vector(0,0), 1, 1, 1);
+		world.addObject(ship);
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testAddObject_doesNotFitInWorld_Negative() {
+		Ship ship = new Ship (new Vector(-2000, -300),new Vector(0,0), 1, 1, 1);
+		world.addObject(ship);
+	}
+
 	@Test
-	public void testRemoveObject_NormalCase() {
-		worldWithObj.removeObject(ship1);
-		assertTrue(ship1.getWorld() == null);
-		
-		
+	public void testRemoveObject() {
+		world.addObject(ship);
+		world.removeObject(ship);
+		assertEquals(0, world.getObjects().size());
 	}
-	
-	@Test (expected=NullPointerException.class)
-	public void testRemoveObject_Null() {
-		Asteroid asteroid = null;
-		worldWithObj.removeObject(asteroid);
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testRemoveObject_IfNull() {
+		world.removeObject(null);
 	}
-	
-	// TO DO
-	
-	@Test
-	public void evolve() {
-		
-	}
-	
-	
-	
-	
-	
+
 
 }

@@ -1,14 +1,14 @@
 package asteroids.model.programs.Statement.standardStatement;
 
-
 import asteroids.model.programs.Statement.*;
+
+
 
 import asteroids.model.*;
 
 import java.util.List;
 import java.util.ArrayList;
 
-import asteroids.model.programs.Statement.Statement;
 
 public class Sequence extends StandardStatement {
 	

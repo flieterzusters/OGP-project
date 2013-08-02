@@ -17,7 +17,7 @@ public class EntityLiteral extends Expression {
 	
 	private SpaceObject spaceobject;
 
-	
+
 	public SpaceObject getValue() {
 		return this.spaceobject;
 	}

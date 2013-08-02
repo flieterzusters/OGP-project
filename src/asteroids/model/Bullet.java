@@ -39,7 +39,7 @@ public class Bullet extends SpaceObject {
 	 * 		  | new.getSource() == source
 	 */
 	
-	public Bullet(Vector position, Vector velocity, double radius, World world, Ship source) {
+	public Bullet(Vector position, Vector velocity, double radius, Ship source) {
 		
 		super(position, velocity, radius);
 		if(isValidSource(source)){

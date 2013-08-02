@@ -2,6 +2,7 @@ package asteroids.model.programs.Statement.standardStatement;
 
 import asteroids.model.programs.Expression.*;
 import asteroids.model.programs.Statement.*;
+import asteroids.model.*;
 
 public class While extends StandardStatement {
 	
@@ -37,5 +38,6 @@ public class While extends StandardStatement {
 			body.execute();
 		}
 	}
+	
 
 }
