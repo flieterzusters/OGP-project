@@ -3,10 +3,11 @@ import asteroids.model.Program;
 
 public class Code {
 	
-	protected Code(int line,int column){
+	protected Code(int line,int column, Program program){
 		
 		setLine(line);
 		setColumn(column);
+		setProgram(program);
 	}
 
 	public void setProgram(Program program){
@@ -34,8 +35,8 @@ public class Code {
 	}
 
 	protected Program program;
-	private int line;
-	private int column;
+	protected int line;
+	protected int column;
 
 }
 

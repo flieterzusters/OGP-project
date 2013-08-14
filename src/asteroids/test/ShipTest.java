@@ -21,16 +21,6 @@ public class ShipTest {
 	private static World testWorld;
 
 	
-
-
-	
-	
-
-	
-	
-	
-
-	
 	@Test (expected=IllegalArgumentException.class)
 	public void moveTest_IllegalCase() throws IllegalArgumentException {
 		dynamicShip1.move(Math.sqrt(-1));

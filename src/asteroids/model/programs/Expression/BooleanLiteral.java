@@ -1,23 +1,18 @@
 package asteroids.model.programs.Expression;
+import asteroids.model.*;
+import asteroids.model.programs.*;
 
 
-public class BooleanLiteral extends BooleanExpression {
+public class BooleanLiteral extends Expression {
 	
-	public BooleanLiteral (int line, int column, boolean b)
+	public BooleanLiteral (int line, int column, Program program, boolean b)
 	{
-		super (line, column);
-		setValue(b);
+		super (line, column, program, new BooleanT(b));
 	}
-	
-	public void setValue(boolean b) {
-		this.value = b;
-	}
-	
-	private boolean value;
-	
+
 	@Override
-	public boolean getValue() {
-		return this.value;
+	public Type getValue() {
+		return getType();
 	}
 
 }

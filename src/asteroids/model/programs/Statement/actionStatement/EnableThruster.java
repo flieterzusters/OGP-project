@@ -4,14 +4,13 @@ import asteroids.model.programs.Statement.*;
 
 public class EnableThruster extends ActionStatement {
 	
-	public EnableThruster(int line, int column) {
-		super (line, column);
+	public EnableThruster(int line, int column, Program program) {
+		super (line, column, program);
 	}
 	
 	@Override
 	public void execute() {
 		Ship currentship = getProgram().getShip();
-		if(currentship == null) {throw new NullPointerException();}
 		currentship.setThrusterActive(true);
 		
 	}

@@ -1,16 +1,18 @@
 package asteroids.model.programs.Expression.doubleExpression;
 import asteroids.model.programs.Expression.*;
+import asteroids.model.programs.*;
+import asteroids.model.*;
 
 public class Add extends ComposedDouble {
 	
-	public Add(int line, int column, Expression e1, Expression e2) {
-		super(line, column, e1, e2);
+	public Add(int line, int column, Program program ,Expression e1, Expression e2) {
+		super(line, column, program, new DoubleT(), e1, e2);
 	}
 	
 	@Override
-	public double getValue() {
-		double sum = (((DoubleExpression) e1).getValue() + ((DoubleExpression) e2).getValue());
-		return sum;
+	public Type getValue() {
+		double sum = (((DoubleT)(e1.getValue())).getValue() + ((DoubleT)(e2.getValue())).getValue());
+		return new DoubleT(sum);
 	}
 
 }

@@ -219,20 +219,39 @@ public class World {
 	 */
 	public void moveAllSpaceObjects(double dt)
 	{
-		for (SpaceObject object : getObjects())
-		{	object.move(dt);
-			if(object instanceof Ship) {
-				Ship ship = (Ship) object;
-				addModifiedSpaceObject(ship);
-				int times = (int) Math.floor(dt / 0.2);
-				if (times == 0){
-					times++;
-				}
-				ship.execute(times);
-			}
+		Set<SpaceObject> asteroidAndBullet = new HashSet<SpaceObject>();
+		asteroidAndBullet.addAll(getAsteroids());
+		asteroidAndBullet.addAll(getBullets());
+		
+		for(SpaceObject object : asteroidAndBullet) {
+			object.move(dt);
 		}
 		
+		this.programtime = this.programtime + dt;
+		if (this.programtime >= 0.2) {
+			nrOfRuns = (int) Math.floor(this.programtime / 0.2);
+			this.programtime = this.programtime - nrOfRuns*0.2; 
+		}
+		
+		for (Ship ship : getShips()) {
+			
+			ship.move(dt);
+			addModifiedSpaceObject(ship);
+			ship.execute(nrOfRuns);
+			}
 	}
+		
+	
+	/**
+	 * A sort of remainder of time from the previous round of executions.
+	 */
+	private double programtime = 0;
+	
+	/**
+	 * Number of times a ship has to run a certain program.
+	 */
+	private int nrOfRuns = 0;
+	
 	
 	
 	/**

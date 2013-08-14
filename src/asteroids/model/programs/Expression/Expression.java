@@ -5,9 +5,13 @@ import asteroids.model.*;
 public abstract class Expression extends Code {
 	
 
-		protected Expression(int line,int column, Type type) {
-			super(line,column);
+		protected Expression(int line,int column, Program program, Type type) {
+			super(line,column, program);
 			setType(type);
+		}
+		
+		protected Expression(int line, int column, Program program) {
+			super(line,column, program);
 		}
 		
 		
@@ -20,12 +24,8 @@ public abstract class Expression extends Code {
 		}
 		
 		private Type type;
-		
-		public abstract String toString();
-		
-		
-		
 
+		public abstract Type getValue();
 }
 
 

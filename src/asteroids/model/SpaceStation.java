@@ -63,7 +63,10 @@ public class SpaceStation extends Ship {
 	 * 		  The ship (space station) to be landed on the space station.
 	 */
 	public void land(Ship ship) {
-		if(!permissionToLand(ship)) {ship.terminate();}
+		if(!permissionToLand(ship)) {
+			ship.terminate();
+			return;
+		}
 		this.currentload = currentload + ship.getMass();
 		landedObjects.add(ship);
 	}
@@ -77,11 +80,12 @@ public class SpaceStation extends Ship {
 	 * 		   A station can't launch a ship (space station) that never landed on this station in the first place.
 	 */
 	public void launch(Ship ship) {
+		
 		if(!landedObjects.contains(ship)) {throw new IllegalArgumentException();}
 		Vector shipspeed = getVelocity().multiply(1.1);
 		ship.setVelocity(shipspeed);
 		ship.setAngle(this.getDirection());
-		double shipxpos = this.getPosition().getX()+this.getRadius();
+		double shipxpos = this.getPosition().getX()+this.getRadius()+ship.getRadius();
 		double shipypos = this.getPosition().getY();
 		ship.setPosition(new Vector(shipxpos, shipypos));
 		this.currentload = currentload - ship.getMass();
@@ -120,8 +124,13 @@ public class SpaceStation extends Ship {
 		if(spaceobject instanceof Asteroid || spaceobject instanceof Bullet) {
 			terminate();}
 		if(spaceobject instanceof Ship) {
-			
-			land((Ship) spaceobject);}
+			Ship ship = (Ship) spaceobject;
+			if(heavierSpacestationCheck(ship)) {
+				ship.resolve(this);
+			}
+			else {
+			land(ship);}
+		}
 	}
 	
 	/**
@@ -140,6 +149,19 @@ public class SpaceStation extends Ship {
 	 * A set containing objects which landed successfully on this space station.
 	 */
 	private Set<Ship> landedObjects = new HashSet<Ship>();
+	
+	/**
+	 * Checks whether a certain ship is a space station and is heavier than
+	 * this space station.
+	 * @param ship
+	 * 		  The ship to check.
+	 * @return
+	 * 		  True if the ship is indeed a heavier space station, otherwise false.
+	 */
+	public boolean heavierSpacestationCheck(Ship ship) {
+		return ((ship instanceof SpaceStation) && (ship.getMass()>this.getMass()));
+	
+	}
 	
 
 }

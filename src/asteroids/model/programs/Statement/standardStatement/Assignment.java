@@ -1,12 +1,13 @@
 package asteroids.model.programs.Statement.standardStatement;
+import asteroids.model.Program;
 import asteroids.model.programs.Expression.*;
 import asteroids.model.programs.Statement.*;
 import asteroids.model.programs.*;
 
-public class Assignment extends StandardStatement {
+public class Assignment extends Statement {
 	
-	public Assignment (int line, int column, String variable, Expression rhs) {
-		super(line, column);
+	public Assignment (int line, int column, Program program, String variable, Expression rhs) {
+		super(line, column, program);
 		setString(variable);
 		setExpression(rhs);
 	}
@@ -32,14 +33,8 @@ public class Assignment extends StandardStatement {
 	
 	@Override
 	public void execute() {
-		Type type = null;
-		if(rhs instanceof BooleanExpression) {
-			type = new BooleanT(((BooleanExpression) rhs).getValue());
-		}
 		
-		else if(rhs instanceof DoubleExpression) {
-			type = new DoubleT(((DoubleExpression) rhs).getValue());
-		}
+		Type type = getExpression().getValue();
 	
 		getProgram().setGlobal(this.string, type);
 	}

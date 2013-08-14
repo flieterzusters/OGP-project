@@ -1,23 +1,18 @@
 package asteroids.model.programs.Expression;
+import asteroids.model.*;
+import asteroids.model.programs.*;
 
-public class DoubleLiteral extends DoubleExpression{
+public class DoubleLiteral extends Expression{
 	
-	public DoubleLiteral(int line, int column, double value)
+	public DoubleLiteral(int line, int column, Program program, double value)
 	{
-		super(line, column);
-		setValue(value);
+		super(line, column, program, new DoubleT(value));
 	}
 	
-	public void setValue(double value)
-	{
-		this.value = value;
-	}
-	
-	private double value = 0.0;
 	
 	@Override
-	public double getValue() {
-		return this.value;
+	public Type getValue() {
+		return getType();
 	}
 	
 

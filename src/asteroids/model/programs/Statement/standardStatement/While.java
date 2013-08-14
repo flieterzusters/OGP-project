@@ -1,42 +1,33 @@
 package asteroids.model.programs.Statement.standardStatement;
 
 import asteroids.model.programs.Expression.*;
+import asteroids.model.programs.*;
 import asteroids.model.programs.Statement.*;
 import asteroids.model.*;
 
-public class While extends StandardStatement {
+public class While extends ComplexStatement {
 	
-	public While(int line, int column, Expression condition, Statement body) {
-		super(line, column);
-		setCondition(condition);
-		setBody(body);
+	public While(int line, int column, Program program, Expression condition, Statement body) {
+		super(line, column, program, body, condition);
 	}
 	
-	public Expression getCondition() {
-		return condition;
-	}
-	
-	public void setCondition(Expression condition) {
-		this.condition = condition;
-	}
-	
-	private Expression condition;
-	
-	public Statement getBody() {
-		return body;
-	}
-	
-	public void setBody(Statement body) {
-		this.body = body;
-	}
-	
-	private Statement body;
 	
 	@Override
 	public void execute() {
-		while(((BooleanExpression) getCondition()).getValue()) {
-			body.execute();
+		boolean condition = ((BooleanT) getCondition().getValue()).getValue();
+		while(condition) {
+			getBody().execute();
+			
+			if(getSequence().getExecutePosition() > getSequence().getStatements().size()) {
+				getSequence().setExecutePosition(1);
+			}
+			if(getSequence().actionHasOccured()) {return;}
 		}
+	}
+	
+	@Override
+	public Sequence getBody() {
+		return getSequence();
 	}
 	
 

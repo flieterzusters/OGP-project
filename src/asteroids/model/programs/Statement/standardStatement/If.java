@@ -1,55 +1,50 @@
 package asteroids.model.programs.Statement.standardStatement;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import asteroids.model.Program;
+import asteroids.model.programs.*;
 import asteroids.model.programs.Expression.*;
 import asteroids.model.programs.Statement.*;
 
 
-public class If extends StandardStatement {
+public class If extends ComplexStatement {
 	
-	public If(int line, int column, Expression condition, Statement then, Statement otherwise) {
-		super(line, column);
-		setCondition(condition);
-		setThen(then);
+	public If(int line, int column, Program program, Expression condition, Statement then, Statement otherwise) {
+		super(line, column, program, then, condition);
 		setOtherwise(otherwise);
 	}
+
 	
-	public Expression getCondition() {
-		return condition;
-	}
-	
-	public void setCondition(Expression condition) {
-		this.condition = condition;
-	}
-	
-	private Expression condition;
-	
-	public Statement getThen() {
-		return then;
-	}
-	
-	public void setThen(Statement then) {
-		this.then = then;
-	}
-	
-	private Statement then;
-	
-	public Statement getOtherwise() {
+	public Sequence getOtherwise() {
 		return otherwise;
 	}
 	
 	public void setOtherwise(Statement otherwise) {
-		this.otherwise = otherwise;
+		if(otherwise instanceof Sequence) { this.otherwise = (Sequence) otherwise; }
+		else {
+			List<Statement> statementsList = new ArrayList<Statement>();
+			this.otherwise = new Sequence(line, column, program, statementsList);
+		}
 	}
 	
-	private Statement otherwise;
+	private Sequence otherwise;
 	
 	@Override
 	public void execute() {
-		if(((BooleanExpression) getCondition()).getValue()) {
-			then.execute();}
-		else{otherwise.execute();}
-			
-		}
+		boolean condition = ((BooleanT) getCondition().getValue()).getValue();
+		Sequence todo = null;
+		if(condition) {todo = getBody();}
+		else {todo = getOtherwise();}
+		
+		todo.execute();
+	}
+	
+	@Override
+	public Sequence getBody() {
+		return getSequence();
+	}
 }
 
 

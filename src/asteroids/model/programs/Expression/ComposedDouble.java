@@ -1,16 +1,18 @@
 package asteroids.model.programs.Expression;
+import asteroids.model.*;
+import asteroids.model.programs.*;
 
-public abstract class ComposedDouble extends DoubleExpression {
+public abstract class ComposedDouble extends Expression {
 	
-	public ComposedDouble(int line, int column, Expression e1, Expression e2) {
+	public ComposedDouble(int line, int column, Program program, Type type, Expression e1, Expression e2) {
 		
-		super(line, column);
+		super(line, column, program, type);
 		setExpression1(e1);
 		setExpression2(e2);
 	}
 	
-	public ComposedDouble(int line, int column, Expression e1) {
-		super(line, column);
+	public ComposedDouble(int line, int column, Program program, Type type, Expression e1) {
+		super(line, column, program, type);
 		setExpression1(e1);
 	}
 	

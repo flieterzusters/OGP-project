@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-public class Sequence extends StandardStatement {
+public class Sequence extends Statement {
 	
-	public Sequence(int line, int column, List<Statement> statements) {
-		super(line, column);
+	public Sequence(int line, int column, Program program, List<Statement> statements) {
+		super(line, column, program);
 		setStatements(statements);
 	}
 	
@@ -41,60 +41,77 @@ public class Sequence extends StandardStatement {
 	
 	private List<Statement> statements;
 
-	
-	@Override
-	public void setProgram(Program program){
-		
-		if (!statements.isEmpty()) {
-			for (Statement statement: statements) {
-				if (statement != null){
-					statement.setProgram(program);
-				}
-			}
-		}
-		this.program = program;
-	}
-	
-	
+
 	@Override
 	public void execute() {
+		setAction(false);
 		
-		if (statements.isEmpty()) {return;}
-		
-		for (Statement statement: statements) 
-		{
-			if (statement != null) 
-			{
-				statement.execute();
-				this.getProgram().setExecutePosition(statement.getLine());
+		for(int i = getExecutePosition();i<=getStatements().size();i++) {
+			Statement currentstatement = statements.get(i-1);
+			
+			if(currentstatement != null) {
+				currentstatement.execute();
 				
-				if (statement instanceof ActionStatement) {return;}
-			}
-		}
-	}
-	
-	public void executeNextCommand(int line) {
-		
-		line = line-1;
-		if(statements.isEmpty()){return;}
-		
-		while (true) 
-		{
-			Statement statement = statements.get(line);
-			if (statement != null) 
-			{
-				statement.execute();
-				line++;
-				line = line%statements.size();
-				
-				if (statement instanceof ActionStatement) 
-				{
-					this.getProgram().setExecutePosition(line+1);
+				if(currentstatement instanceof ActionStatement) {
+					setAction(true);
+					setExecutePosition(i+1);
 					return;
 				}
+				
+				if(currentstatement instanceof ComplexStatement) {
+					
+					ComplexStatement loop = (ComplexStatement) currentstatement;
+					Sequence sequence = loop.getBody();
+					
+					if(sequence.actionHasOccured()) {
+						if (sequence.getExecutePosition() == (sequence.getStatements().size()+1)) {
+							setExecutePosition(i+1);
+							sequence.setExecutePosition(1);
+						}
+						else {
+							setExecutePosition(1);
+						}
+						
+						setAction(true);
+						return;
+					}
+					
+					if (sequence.getExecutePosition() == (sequence.getStatements().size()+1)) {
+						setExecutePosition(1);
+					}
+					
+	
+					
+					
+				}
 			}
+			
 		}
+		setExecutePosition(getStatements().size()+1);
+		setAction(false);
+		
+		
 	}
+	
+	public boolean actionHasOccured() {
+		return actionoccured;
+	}
+	
+	public void setAction(boolean value) {
+		this.actionoccured = value;
+	}
+	
+	private boolean actionoccured=false;
+	
+	public int getExecutePosition() {
+		return this.executeposition;
+	}
+	
+	public void setExecutePosition(int value) {
+		this.executeposition = value;
+	}
+	
+	private int executeposition=1;
 }
 		
 

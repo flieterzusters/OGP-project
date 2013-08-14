@@ -1,22 +1,20 @@
 package asteroids.model.programs.Expression;
 
 import asteroids.model.programs.*;
+import asteroids.model.*;
 
-public class Variable extends DoubleExpression {
+public class Variable extends Expression {
 	
-	public Variable (int line, int column, String string)
+	public Variable (int line, int column, Program program, String string)
 	{
-		super(line, column);
+		super(line, column, program);
 		setString(string);
 	}
 	
 	@Override
-	public double getValue() {
+	public Type getValue() {
 		Type type = getProgram().getGlobal(value);
-		double value = ((DoubleT) type).getValue();
-		return value;
-		
-		
+		return type;
 	}
 	
 	public String getString() {

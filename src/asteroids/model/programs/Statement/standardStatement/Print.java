@@ -1,12 +1,13 @@
 package asteroids.model.programs.Statement.standardStatement;
 
+import asteroids.model.Program;
 import asteroids.model.programs.Expression.*;
 import asteroids.model.programs.Statement.*;
 
-public class Print extends StandardStatement {
+public class Print extends Statement {
 	
-	public Print (int line, int column, Expression e) {
-		super(line, column);
+	public Print (int line, int column, Program program, Expression e) {
+		super(line, column, program);
 		setExpression(e);
 	}
 	

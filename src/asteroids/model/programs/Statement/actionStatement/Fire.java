@@ -4,14 +4,13 @@ import asteroids.model.programs.Statement.*;
 
 public class Fire extends ActionStatement {
 	
-	public Fire(int line, int column) {
-		super (line, column);
+	public Fire(int line, int column, Program program) {
+		super (line, column, program);
 	}
 	
 	@Override
 	public void execute() {
 		Ship currentship = getProgram().getShip();
-		if(currentship == null) {throw new NullPointerException();}
 		currentship.fireBullet();
 		
 	}
